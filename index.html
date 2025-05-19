@@ -240,7 +240,7 @@
         bg: '111111',
         speech: '你成功存到一筆錢，社工希望幫你開戶',
         choices: [
-          { text: '拒絕', next: 'a1' }
+          { text: '拒絕', next: 'a1' },
           { text: '配合開戶', next: 'a2' }
         ]
       },
@@ -260,7 +260,7 @@
         bg: '111111',
         speech: '你決定出去透透氣，買了杯飲料，在巷口走了一圈。',
         choices: [
-          { text: '依約時間返回機構', next: 'a4' }
+          { text: '依約時間返回機構', next: 'a4' },
           { text: '外出超過門禁時間', next: 'a5' }
         ]
       },
@@ -268,7 +268,7 @@
         bg: '111111',
         speech: '社工依規定請你配合搜身，檢查是否有攜帶違禁品。',
         choices: [
-          { text: '配合搜身', next: 'a6' }
+          { text: '配合搜身', next: 'a6' },
           { text: '拒絕配合', next: 'a7' }
         ]
       },
@@ -281,7 +281,7 @@
         bg: '111111',
         speech: '對於搜身，你決定⋯⋯',
         choices: [
-          { text: '選擇留下❗ 計一點', next: 'a8' }
+          { text: '選擇留下❗ 計一點', next: 'a8' },
           { text: '覺得受不了制度管束 ，選擇離開機構回到街頭', next: 'a9' }
         ]
       },
@@ -289,17 +289,20 @@
         bg: '111111',
         speech: '由於外出超過門禁時間，你決定⋯⋯',
         choices: [
-          { text: '選擇留下❗ 計一點', next: 'a8' }
+          { text: '選擇留下❗ 計一點', next: 'a8' },
           { text: '覺得受不了制度管束 ，選擇離開機構回到街頭', next: 'a9' }
         ]
       },
     };
 
     function startGame() {
-      document.getElementById('startScreen').style.animation = 'fadeOut 1s ease forwards';
-      setTimeout(() => document.getElementById('startScreen').style.display = 'none', 1000);
-    }
-
+  const startScreen = document.getElementById('startScreen');
+  startScreen.style.animation = 'fadeOut 1s ease forwards';
+  setTimeout(() => {
+    startScreen.style.display = 'none';
+    goTo('accept'); 
+  }, 1000);
+}
     function goTo(key) {
       const scene = scenes[key];
       const game = document.getElementById('game');
