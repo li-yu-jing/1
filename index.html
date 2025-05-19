@@ -296,13 +296,13 @@
     };
 
     function startGame() {
-  const startScreen = document.getElementById('startScreen');
-  startScreen.style.animation = 'fadeOut 1s ease forwards';
-  setTimeout(() => {
-    startScreen.style.display = 'none';
-    goTo('accept'); 
-  }, 1000);
-}
+      const startScreen = document.getElementById('startScreen');
+      startScreen.style.animation = 'fadeOut 1s ease forwards';
+      setTimeout(() => {
+      startScreen.style.display = 'none';
+      }, 1000);
+    }
+
     function goTo(key) {
       const scene = scenes[key];
       const game = document.getElementById('game');
