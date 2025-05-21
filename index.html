@@ -56,17 +56,24 @@
     }
     .start-screen {
       position: absolute;
-      width: 100%;
-      height: 100%;
-      background: #111;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 3;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: url('開場白.png');
+      background-size: cover;
+      background-position: center;
+      z-index: 5;
+      cursor: pointer;
       animation: fadeIn 1s ease forwards;
     }
+    #introVideo {
+   display: none;
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+   z-index: 6;
+}
     .start-screen h1 {
       font-size: 28px;
       margin-bottom: 20px;
@@ -107,16 +114,16 @@
       z-index: 5;
       cursor: pointer;
     }
-     /* ⭐️ 新增的開場動畫樣式 */
-     .start-screen {
+    /* 開場影片樣式 */
+    #introVideo {
+      display: none;
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-image: url('開場白.png');
-      background-size: cover;
-      background-position: center;
-      z-index: 5;
-      cursor: pointer;
-      animation: fadeIn 1s ease forwards;
+      top: 0;
+      left: 0;
+      width: 100％;
+      height: 100％;
+      object-fit: cover;
+      z-index: 10;
     }
   </style>
 </head>
@@ -128,15 +135,21 @@
       <button class="btn" onclick="goTo('decline')">不入住<br>你將繼續露宿街頭</button>
     </div>
 
-    <div class="start-screen" id="startScreen" onclick="startGame()">
+    <div class="start-screen" id="startScreen">
       <div style="position: absolute; bottom: 20px; width: 100%; text-align: center; color: white; font-size: 16px;">
         點擊畫面繼續
+      </div>
     </div>
-     </div>
+
+    <video id="introVideo" playsinline autoplay muted>
+      <source src="Line對話影片.mp4" type="video/mp4">
+      您的瀏覽器不支援 HTML5 視訊。
+    </video>
 
     <div class="end-screen" id="endScreen"></div>
     <div id="clickOverlay"></div>
   </div>
+
   <script>
     const scenes = {
       accept: {
@@ -291,12 +304,21 @@
       },
     };
 
-    function startGame() {
-      const startScreen = document.getElementById('startScreen');
-      startScreen.style.animation = 'fadeOut 0.01s ease forwards';
-      setTimeout(() => {
-      startScreen.style.display = 'none';
-      }, 100);
+    const startScreen = document.getElementById('startScreen');
+    const video = document.getElementById('introVideo');
+
+    startScreen.addEventListener("click", () => {
+      startScreen.style.display = "none";
+      video.style.display = "block";
+      video.play();
+      video.onended = () => {
+        video.style.display = "none";
+        startScene(); // 播完影片再進入第一幕
+      };
+    });
+
+    function startScene() {
+      goTo("accept");
     }
 
     function goTo(key) {
@@ -313,7 +335,7 @@
 
       if (scene.choices.length > 0) {
         choices.innerHTML = scene.choices.map(choice =>
-          <button class="btn" onclick="goTo('${choice.next}')">${choice.text}</button>
+          `<button class="btn" onclick="goTo('${choice.next}')">${choice.text}</button>`
         ).join('');
       } else {
         choices.innerHTML = '<div style="color: white; font-size: 14px;">（點擊畫面繼續）</div>';
