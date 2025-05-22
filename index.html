@@ -65,15 +65,15 @@
       animation: fadeIn 1s ease forwards;
     }
     #introVideo {
-   display: none;
-   position: absolute;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   object-fit: cover;
-   z-index: 6;
-}
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 6;
+    }
     .start-screen h1 {
       font-size: 28px;
       margin-bottom: 20px;
@@ -114,8 +114,38 @@
       z-index: 5;
       cursor: pointer;
     }
-    /* 開場影片樣式 */
-   
+    /* 額外新增：圖片步驟樣式 */
+    #imageStep {
+      display: none;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-size: cover;
+      background-position: center;
+      z-index: 6;
+    }
+    #imageStepBtn {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 7;
+      background-color: transparent !important;
+      color: white;
+    }
+   .line-button {
+  width: 300px;
+  position: absolute;       /* 加這行才能讓 bottom 生效 */
+  left: 50%;                /* 水平置中 */
+  bottom: 10px;             /* 距離底部 10px */
+  transform: translateX(-50%);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+.line-button:hover {
+  transform: translateX(-50%) scale(1.2); /* 放大但保持置中 */
+}
+
   </style>
 </head>
 <body>
@@ -137,6 +167,13 @@
       您的瀏覽器不支援 HTML5 視訊。
     </video>
 
+    <!-- 新增：兩張圖片流程 -->
+    <div id="imageStep">
+  
+      <img id="imageStepBtn" class="line-button" src="Line按鈕.png" alt="下一步" />
+
+    </div>
+
     <div class="end-screen" id="endScreen"></div>
     <div id="clickOverlay"></div>
   </div>
@@ -144,7 +181,7 @@
   <script>
     const scenes = {
       accept: {
-        bg: '111111',
+        bg: 'day3.png',
         speech: '你剛被安置進這間機構，身上帶著簡單的行李，內心混雜著疲憊與戒心。這裡比街頭安全，卻讓你感到陌生。生活開始規律，日復一日，有點無聊。',
         choices: [
           { text: '決定先觀察一陣子，獨自在房間休息', next: 'bbb' },
@@ -152,7 +189,7 @@
         ]
       },
       aaa: {
-        bg: '111111',
+        bg: '團康甩手功.png',
         speech: '是否參加安置機構團康活動',
         choices: [
           { text: '不願參加，找理由推託', next: 'ddd' },
@@ -160,7 +197,7 @@
         ]
       },
       bbb: {
-        bg: '111111',
+        bg: 'day04.png',
         speech: '生活輔導員發現你在團體活動時間躲在房間內⋯⋯',
         choices: [
           { text: '草草應付參加活動', next: 'ccc' },
@@ -168,7 +205,7 @@
         ]
       },
       ddd: {
-        bg: '111111',
+        bg: '強制參加團康活動.png',
         speech: '生活輔導員強硬要求你參與活動',
         choices: [
           { text: '強忍不滿參加', next: 'ccc' },
@@ -176,7 +213,7 @@
         ]
       },
       ccc: {
-        bg: '111111',
+        bg: '交友圈.png',
         speech: '你發現機構中大家都有交友圈，你感到孤單⋯⋯',
         choices: [
           { text: '躲回原本的生活習慣', next: 'lll' },
@@ -192,7 +229,7 @@
         ]
       },
       jjj: {
-        bg: '111111',
+        bg: '室友很煩.png',
         speech: '室友很煩，晚上不睡覺在房間抱怨社會',
         choices: [
           { text: '試圖溝通', next: 'mmm' },
@@ -231,13 +268,13 @@
         ]
       },
       uuu: {
-        bg: '111111',
+        bg: '社工推薦打掃工作.png',
         speech: '成為清潔工（機構內），你每天清掃不同樓層，雖然辛苦，還是撐了下來。',
         autoNext: 'zzz',
         choices: []
       },
       zzz: {
-        bg: '111111',
+        bg: '給社工管錢.png',
         speech: '你成功存到一筆錢，社工希望幫你開戶',
         choices: [
           { text: '拒絕', next: 'a1' },
@@ -297,6 +334,11 @@
 
     const startScreen = document.getElementById('startScreen');
     const video = document.getElementById('introVideo');
+    const imageStep = document.getElementById('imageStep');
+    const imageStepBtn = document.getElementById('imageStepBtn');
+
+    let imageSteps = ['Line回覆.png', '生活公約.png'];
+    let currentImageStep = 0;
 
     startScreen.addEventListener("click", () => {
       startScreen.style.display = "none";
@@ -304,8 +346,24 @@
       video.play();
       video.onended = () => {
         video.style.display = "none";
-        startScene(); // 播完影片再進入第一幕
+        showNextImageStep(); // 顯示第一張圖片
       };
+    });
+
+    function showNextImageStep() {
+      if (currentImageStep < imageSteps.length) {
+        imageStep.style.backgroundImage = `url('${imageSteps[currentImageStep]}')`;
+        imageStep.style.display = "block";
+        imageStepBtn.src = currentImageStep === imageSteps.length - 1 ? "我已閱讀按鈕.png" : "Line按鈕.png";
+      } else {
+        imageStep.style.display = "none";
+        startScene();
+      }
+    }
+
+    imageStepBtn.addEventListener("click", () => {
+      currentImageStep++;
+      showNextImageStep();
     });
 
     function startScene() {
