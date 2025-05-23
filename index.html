@@ -221,7 +221,7 @@
         ]
       },
       ggg: {
-        bg: '111111',
+        bg: '苦惱的我.png',
         speech: '你覺得機構的規範很嚴格，決定⋯⋯',
         choices: [
           { text: '受不了制度管束，決定離開', next: 'ccc' },
@@ -237,7 +237,7 @@
         ]
       },
       lll: {
-        bg: '111111',
+        bg: '想喝了.png',
         speech: '想喝酒解悶',
         choices: [
           { text: '偷喝一點', next: 'ppp' },
@@ -246,7 +246,7 @@
       },
       ppp: {
         bg: '111111',
-        speech: '偷偷喝酒解悶',
+        speech: '你已經觸犯生活公約⚠️',
         choices: [
           { text: '選擇留下 ❗ 計一點', next: 'mmm' },
           { text: '受不了制度管束，主動決定離開', next: 'mmm' }
@@ -294,7 +294,7 @@
         choices: []
       },
       a3: {
-        bg: '111111',
+        bg: '買飲料.png',
         speech: '你決定出去透透氣，買了杯飲料，在巷口走了一圈。',
         choices: [
           { text: '依約時間返回機構', next: 'a4' },
@@ -384,16 +384,4 @@
 
       if (scene.choices.length > 0) {
         choices.innerHTML = scene.choices.map(choice =>
-          `<button class="btn" onclick="goTo('${choice.next}')">${choice.text}</button>`
-        ).join('');
-      } else {
-        choices.innerHTML = '<div style="color: white; font-size: 14px;">（點擊畫面繼續）</div>';
-        overlay.style.display = 'block';
-        overlay.onclick = () => {
-          goTo(scene.autoNext || 'start');
-        };
-      }
-    }
-  </script>
-</body>
-</html>
+          <button class="btn" onclick="goTo('${choice.next}')">${choice.text}</button>
