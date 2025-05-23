@@ -384,4 +384,16 @@
 
       if (scene.choices.length > 0) {
         choices.innerHTML = scene.choices.map(choice =>
-          <button class="btn" onclick="goTo('${choice.next}')">${choice.text}</button>
+          `<button class="btn" onclick="goTo('${choice.next}')">${choice.text}</button>`
+        ).join('');
+      } else {
+        choices.innerHTML = '<div style="color: white; font-size: 14px;">（點擊畫面繼續）</div>';
+        overlay.style.display = 'block';
+        overlay.onclick = () => {
+          goTo(scene.autoNext || 'start');
+        };
+      }
+    }
+  </script>
+</body>
+</html>
