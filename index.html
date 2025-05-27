@@ -179,6 +179,27 @@
   </div>
 
   <script>
+    const allImages = [
+  '開場白.png', 'Line對話影片.mp4', 'Line回覆.png', '生活公約.png', '我已閱讀按鈕.png',
+  '社工關懷街頭無家者.png', 'day3.png', '團康甩手功.png', 'day04.png', '強制參加團康活動.png',
+  '交友圈.png', '苦惱的我.png', '室友很煩.png', '想喝酒.png', '社工抓包.png', '職涯課.png',
+  '找工作.png', '社工推薦打掃工作.png', '給社工管錢.png', '沒錢了.png', '戒菸酒.png', '買飲料.png',
+  '翻包包.png', '租屋.png', '翻包2.png', '超時.png', 'Line按鈕.png'
+];
+
+function preloadImages(images, callback) {
+  let loaded = 0;
+  const total = images.length;
+  for (let i = 0; i < total; i++) {
+    const img = new Image();
+    img.src = images[i];
+    img.onload = img.onerror = () => {
+      loaded++;
+      if (loaded === total) callback(); // 全部載入後執行 callback
+    };
+  }
+}
+
     const scenes = {
       accept: {
         bg: 'day3.png',
@@ -341,14 +362,18 @@
     let currentImageStep = 0;
 
     startScreen.addEventListener("click", () => {
-      startScreen.style.display = "none";
-      video.style.display = "block";
-      video.play();
-      video.onended = () => {
-        video.style.display = "none";
-        showNextImageStep(); // 顯示第一張圖片
-      };
-    });
+  preloadImages(allImages, () => {
+    // 圖片預載完才繼續
+    startScreen.style.display = "none";
+    video.style.display = "block";
+    video.play();
+    video.onended = () => {
+      video.style.display = "none";
+      showNextImageStep(); // 顯示第一張圖片
+    };
+  });
+});
+
 
     function showNextImageStep() {
       if (currentImageStep < imageSteps.length) {
