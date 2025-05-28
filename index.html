@@ -30,18 +30,21 @@
       text-align: center;
       z-index: 2;
     }
-    .btn {
-      margin: 10px;
-      padding: 10px 20px;
-      border: none;
-      font-size: 16px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .btn:hover {
-      transform: scale(1.05);
-    }
+     .btn {
+  margin: 10px;
+  padding: 10px 20px;
+  border: 2px solid black;  /* 黑邊 */
+  background-color: white;   /* 白底 */
+  color: black;              /* 黑字 */
+  font-size: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn:hover {
+  background-color: #f0f0f0; /* 滑過時微灰色 */
+  transform: scale(1.05);
+}
     .speech-bubble {
       position: absolute;
       bottom: 150px;
