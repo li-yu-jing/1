@@ -154,8 +154,8 @@
       </div>
     </div>
 
-    <video id="introVideo" playsinline autoplay muted>
-      <source src="Line對話01.mp4" type="video/mp4">
+    <video id="introVideo" playsinline autoplay muted preload="auto">
+      <source src="Line對話1.mp4" type="video/mp4">
       您的瀏覽器不支援 HTML5 視訊。
     </video>
 
@@ -169,7 +169,7 @@
 
   <script>
     const allImages = [
-    '開場白.png', 'Line對話01.mp4', 'Line回覆更.png','Line對話02.mp4', '生活公約.png', '我已閱讀按鈕.png',
+    '開場白.png', 'Line對話1.mp4', 'Line回覆更.png','Line對話02.mp4', '生活公約.png', '我已閱讀按鈕.png',
   '社工關懷街頭無家者.png', 'day3.png', '團康甩手功.png', 'day04.png', '強制參加團康活動.png',
   '交友圈.png', '苦惱的我.png', '室友很煩.png', '想喝酒.png', '社工抓包.png', '職涯課.png',
   '找工作.png', '社工推薦打掃工作.png', '給社工管錢.png', '沒錢了.png', '戒菸酒.png', '買飲料.png',
@@ -203,7 +203,7 @@
     startScreen.addEventListener("click", () => {
       preloadImages(allImages, () => {
         startScreen.style.display = "none";
-        video.src = "Line對話01.mp4";
+        video.src = "Line對話1.mp4";
         video.style.display = "block";
         video.play();
         video.onended = () => {
