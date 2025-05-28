@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=375, initial-scale=1.0" />
   <title>街友安置體驗</title>
   <style>
     body {
@@ -25,7 +25,7 @@
     }
     .content {
       position: absolute;
-      bottom: 40px;
+      bottom: 18px;
       width: 100%;
       text-align: center;
       z-index: 2;
@@ -44,7 +44,7 @@
     }
     .speech-bubble {
       position: absolute;
-      bottom: 200px;
+      bottom: 150px;
       left: 20px;
       right: 20px;
       background: rgba(255,255,255,0.9);
@@ -62,7 +62,6 @@
       background-position: center;
       z-index: 5;
       cursor: pointer;
-      animation: fadeIn 1s ease forwards;
     }
     #introVideo {
       display: none;
@@ -73,14 +72,6 @@
       height: 100%;
       object-fit: cover;
       z-index: 6;
-    }
-    .start-screen h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-    .start-screen .btn {
-      background-color: #4caf50;
-      color: white;
     }
     .end-screen {
       position: absolute;
@@ -93,7 +84,6 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      animation: fadeIn 2s ease forwards;
     }
     .end-message {
       background-color: rgba(0,0,0,0.6);
@@ -114,7 +104,6 @@
       z-index: 5;
       cursor: pointer;
     }
-    /* 額外新增：圖片步驟樣式 */
     #imageStep {
       display: none;
       position: absolute;
@@ -133,19 +122,18 @@
       background-color: transparent !important;
       color: white;
     }
-   .line-button {
-  width: 300px;
-  position: absolute;       /* 加這行才能讓 bottom 生效 */
-  left: 50%;                /* 水平置中 */
-  bottom: 10px;             /* 距離底部 10px */
-  transform: translateX(-50%);
-  transition: transform 0.3s ease;
-  cursor: pointer;
-}
-.line-button:hover {
-  transform: translateX(-50%) scale(1.2); /* 放大但保持置中 */
-}
-
+    .line-button {
+      width: 300px;
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    .line-button:hover {
+      transform: translateX(-50%) scale(1.2);
+    }
   </style>
 </head>
 <body>
@@ -163,15 +151,12 @@
     </div>
 
     <video id="introVideo" playsinline autoplay muted>
-      <source src="Line對話影片.mp4" type="video/mp4">
+      <source src="Line對話01.mp4" type="video/mp4">
       您的瀏覽器不支援 HTML5 視訊。
     </video>
 
-    <!-- 新增：兩張圖片流程 -->
     <div id="imageStep">
-  
       <img id="imageStepBtn" class="line-button" src="Line按鈕.png" alt="下一步" />
-
     </div>
 
     <div class="end-screen" id="endScreen"></div>
@@ -180,25 +165,85 @@
 
   <script>
     const allImages = [
-  '開場白.png', 'Line對話影片.mp4', 'Line回覆.png', '生活公約.png', '我已閱讀按鈕.png',
+    '開場白.png', 'Line對話01.mp4', 'Line回覆更.png','Line對話02.mp4', '生活公約.png', '我已閱讀按鈕.png',
   '社工關懷街頭無家者.png', 'day3.png', '團康甩手功.png', 'day04.png', '強制參加團康活動.png',
   '交友圈.png', '苦惱的我.png', '室友很煩.png', '想喝酒.png', '社工抓包.png', '職涯課.png',
   '找工作.png', '社工推薦打掃工作.png', '給社工管錢.png', '沒錢了.png', '戒菸酒.png', '買飲料.png',
   '翻包包.png', '租屋.png', '翻包2.png', '超時.png', 'Line按鈕.png'
-];
+    ];
 
-function preloadImages(images, callback) {
-  let loaded = 0;
-  const total = images.length;
-  for (let i = 0; i < total; i++) {
-    const img = new Image();
-    img.src = images[i];
-    img.onload = img.onerror = () => {
-      loaded++;
-      if (loaded === total) callback(); // 全部載入後執行 callback
+    const imageSteps = ['Line回覆更.png', '生活公約.png'];
+    const videoAfterImage = {
+      'Line回覆更.png': 'Line對話02.mp4'
     };
-  }
-}
+
+    let currentImageStep = 0;
+
+    const startScreen = document.getElementById('startScreen');
+    const video = document.getElementById('introVideo');
+    const imageStep = document.getElementById('imageStep');
+    const imageStepBtn = document.getElementById('imageStepBtn');
+
+    startScreen.addEventListener("click", () => {
+      preloadImages(allImages, () => {
+        startScreen.style.display = "none";
+        video.src = "Line對話01.mp4";
+        video.style.display = "block";
+        video.play();
+        video.onended = () => {
+          video.style.display = "none";
+          showNextImageStep();
+        };
+      });
+    });
+
+    function showNextImageStep() {
+      if (currentImageStep < imageSteps.length) {
+        const currentImage = imageSteps[currentImageStep];
+        imageStep.style.backgroundImage = `url('${currentImage}')`;
+        imageStep.style.display = "block";
+        imageStepBtn.src = currentImage === '生活公約.png' ? "我已閱讀按鈕.png" : "Line按鈕.png";
+      } else {
+        imageStep.style.display = "none";
+        startScene();
+      }
+    }
+
+    imageStepBtn.addEventListener("click", () => {
+      const currentImage = imageSteps[currentImageStep];
+
+      if (videoAfterImage[currentImage]) {
+        imageStep.style.display = "none";
+        video.src = videoAfterImage[currentImage];
+        video.style.display = "block";
+        video.play();
+        video.onended = () => {
+          video.style.display = "none";
+          currentImageStep++;
+          showNextImageStep();
+        };
+      } else {
+        currentImageStep++;
+        showNextImageStep();
+      }
+    });
+
+    function preloadImages(images, callback) {
+      let loaded = 0;
+      const total = images.length;
+      for (let i = 0; i < total; i++) {
+        const img = new Image();
+        img.src = images[i];
+        img.onload = img.onerror = () => {
+          loaded++;
+          if (loaded === total) callback();
+        };
+      }
+    }
+
+    function startScene() {
+      goTo("accept");
+    }
 
     const scenes = {
       accept: {
@@ -407,48 +452,6 @@ function preloadImages(images, callback) {
       },
     };
 
-    const startScreen = document.getElementById('startScreen');
-    const video = document.getElementById('introVideo');
-    const imageStep = document.getElementById('imageStep');
-    const imageStepBtn = document.getElementById('imageStepBtn');
-
-    let imageSteps = ['Line回覆.png', '生活公約.png'];
-    let currentImageStep = 0;
-
-    startScreen.addEventListener("click", () => {
-  preloadImages(allImages, () => {
-    // 圖片預載完才繼續
-    startScreen.style.display = "none";
-    video.style.display = "block";
-    video.play();
-    video.onended = () => {
-      video.style.display = "none";
-      showNextImageStep(); // 顯示第一張圖片
-    };
-  });
-});
-
-
-    function showNextImageStep() {
-      if (currentImageStep < imageSteps.length) {
-        imageStep.style.backgroundImage = `url('${imageSteps[currentImageStep]}')`;
-        imageStep.style.display = "block";
-        imageStepBtn.src = currentImageStep === imageSteps.length - 1 ? "我已閱讀按鈕.png" : "Line按鈕.png";
-      } else {
-        imageStep.style.display = "none";
-        startScene();
-      }
-    }
-
-    imageStepBtn.addEventListener("click", () => {
-      currentImageStep++;
-      showNextImageStep();
-    });
-
-    function startScene() {
-      goTo("accept");
-    }
-
     function goTo(key) {
       const scene = scenes[key];
       const game = document.getElementById('game');
@@ -456,7 +459,7 @@ function preloadImages(images, callback) {
       const choices = document.getElementById('choices');
       const overlay = document.getElementById('clickOverlay');
 
-      game.style.backgroundImage = scene.bg === '111111' ? 'none' : `url('${scene.bg}')`;
+      game.style.backgroundImage = `url('${scene.bg}')`;
       speech.innerText = scene.speech;
       overlay.style.display = 'none';
       overlay.onclick = null;
