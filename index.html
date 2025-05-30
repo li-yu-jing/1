@@ -452,7 +452,32 @@ imageStepBtn.src = customButtons[currentImage] || "點擊螢幕前往下一步.p
       },
       a6: {
         bg: '租屋.png',
-        speech: '慢慢的你存到一筆存款，足夠去外面租房。在社工的幫助下你找到機構外的工作，透過安置機構的輔助，恢復職能，重建自立生活。',
+        speech: '從努力參與職場見習，接下機構內的清潔工作，生活逐漸有了規律。一開始很難，但你慢慢撐下來了。',
+        autoNext: 'a20',
+        choices: []
+      },
+      a20: {
+        bg: '租屋.png',
+        speech: '你學會如何安排自己的收入，也逐漸存下一筆錢。',
+        autoNext: 'a21',
+        choices: []
+      },
+      a21: {
+        bg: '租屋.png',
+        speech: '幾個月後，在社工的協助下，找到一份機構外的穩定工作，收入也能順利租下一間小套房。',
+        autoNext: 'a22',
+        choices: []
+      },
+      a22: {
+        bg: '租屋.png',
+        speech: '拉著行李站在人來人往的街口時，你忽然有了自己成功脫遊的實感——',
+        autoNext: 'a23',
+        choices: []
+      },
+      a23: {<!-- 綠色結局 -->
+        bg: '租屋.png',
+        speech: '自己終於離開了那段過渡時期，重新走回屬於自己的生活。',
+        autoNext: 'a24',
         choices: []
       },
       a5: {
@@ -507,7 +532,7 @@ imageStepBtn.src = customButtons[currentImage] || "點擊螢幕前往下一步.p
         autoNext: 'a15',
         choices: []
       },
-    a16: {
+    a16: {<!-- 回到街頭 -->
         bg: '租屋.png',
         speech: '回到你熟悉的街頭，繼續過自由自在的日子。',
         autoNext: 'a17',
