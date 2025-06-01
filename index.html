@@ -13,41 +13,81 @@
       align-items: center;
       height: 100vh;
       font-family: 'Noto Sans TC', sans-serif;
+      overflow: hidden; /* 防止滾動條 */
     }
     .game-container {
       width: 375px;
       height: 667px;
       position: relative;
-      background-size: cover;
-      background-position: center;
+      background-color: black;
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
       overflow: hidden;
     }
+
+    /* 新增的背景圖片元素樣式 */
+    #background-image-element {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* 確保圖片覆蓋整個容器 */
+        opacity: 1; /* 預設完全不透明 */
+        /* REMOVED: transition: opacity 0.7s ease-in-out; */ /* 移除淡入淡出效果 */
+        z-index: 1; /* 確保在最底層 */
+    }
+    /* The .active class is no longer needed for opacity transition but can be kept if other active states are planned */
+    /* #background-image-element.active {
+        opacity: 1;
+    } */
+
+    /* 所有遊戲內容（對話框、按鈕、影片）都在背景圖片之上 */
+    .content,
+    .speech-bubble,
+    .start-screen,
+    #introVideo,
+    #imageStep,
+    #imageStepBtn,
+    .end-screen,
+    #clickOverlay {
+      position: absolute; /* 確保 z-index 生效 */
+      z-index: 2; /* 比背景圖片高 */
+    }
+
+    /* 確保影片顯示在背景圖片之上 */
+    #introVideo {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none; /* 預設隱藏 */
+      z-index: 3; /* 比其他互動元素略高，確保影片層次正確 */
+    }
+
+    /* 其他既有樣式 (保留不變) */
     .content {
-      position: absolute;
       bottom: 18px;
       width: 100%;
       text-align: center;
-      z-index: 2;
+      display: none; /* 預設隱藏 */
     }
     .btn {
-  margin: 10px;
-  padding: 10px 20px;
-  border: 2px solid black;  /* 黑邊 */
-  background-color: white;   /* 白底 */
-  color: black;              /* 黑字 */
-  font-size: 16px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.btn:hover {
-  background-color: #f0f0f0; /* 滑過時微灰色 */
-  transform: scale(1.05);
-}
-
+      margin: 10px;
+      padding: 10px 20px;
+      border: 2px solid black;
+      background-color: white;
+      color: black;
+      font-size: 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn:hover {
+      background-color: #f0f0f0;
+      transform: scale(1.05);
+    }
     .speech-bubble {
-      position: absolute;
       bottom: 150px;
       left: 20px;
       right: 20px;
@@ -56,34 +96,21 @@
       border-radius: 10px;
       font-weight: bold;
       font-size: 16px;
-      z-index: 2;
+      display: none; /* 預設隱藏 */
     }
     .start-screen {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-image: url('開場白.png');
+      /* 開場白02.png 仍然使用 background-image */
+      background-image: url('開場白02.png');
       background-size: cover;
       background-position: center;
-      z-index: 5;
+      top: 0; left: 0; width: 100%; height: 100%;
       cursor: pointer;
     }
-    #introVideo {
-      display: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 6;
-    }
     .end-screen {
-      position: absolute;
       width: 100%;
       height: 100%;
       background-size: cover;
       background-position: center;
-      z-index: 4;
       display: none;
       justify-content: center;
       align-items: center;
@@ -100,53 +127,63 @@
     }
     #clickOverlay {
       display: none;
-      position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: 5;
       cursor: pointer;
     }
     #imageStep {
       display: none;
-      position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background-size: cover;
-      background-position: center;
-      z-index: 6;
     }
     #imageStepBtn {
       position: absolute;
       bottom: 40px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 7;
       background-color: transparent !important;
       color: white;
+      border: none; /* 確保按鈕沒有邊框 */
+      padding: 0; /* 移除內邊距 */
+      display: none; /* 預設隱藏 */
     }
     .line-button {
-      width: 300px;
-      position: absolute;
-      left: 50%;
-      bottom: 10px;
-      transform: translateX(-50%);
+      width: 300px; /* 根據 Line按鈕.png 的寬度設定 */
       transition: transform 0.3s ease;
       cursor: pointer;
     }
     .line-button:hover {
       transform: translateX(-50%) scale(1.2);
     }
+    /* 載入畫面 */
+    #loadingScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 1s ease-out; /* 載入畫面淡出效果 */
+    }
   </style>
 </head>
 <body>
-  <div class="game-container" id="game" style="background-image: url('社工關懷街頭無家者.png');">
-    <div class="speech-bubble" id="speech">社工：要不要入住安置機構？</div>
-    <div class="content" id="choices">
-      <button class="btn" onclick="goTo('accept')">入住機構<br>你會有個安身之處</button>
-      <button class="btn" onclick="goTo('decline')">不入住<br>你將繼續露宿街頭</button>
-    </div>
+  <div id="loadingScreen">載入中... 0%</div>
+
+  <div class="game-container" id="mainGameContainer">
+    <img id="background-image-element" src="" alt="背景圖片">
+
+    <div class="speech-bubble" id="speech"></div>
+    <div class="content" id="choices"></div>
 
     <div class="start-screen" id="startScreen">
       <div style="position: absolute; bottom: 20px; width: 100%; text-align: center; color: white; font-size: 16px;">
@@ -155,7 +192,7 @@
     </div>
 
     <video id="introVideo" playsinline autoplay muted preload="auto">
-      <source src="Line對話1.mp4" type="video/mp4">
+      <source src="" type="video/mp4">
       您的瀏覽器不支援 HTML5 視訊。
     </video>
 
@@ -169,25 +206,31 @@
 
   <script>
     const allImages = [
-    '開場白.png', 'Line對話1.mp4', 'Line回覆更.png','Line對話02.mp4', '生活公約.png', '我已閱讀按鈕.png',
-  '社工關懷街頭無家者.png', 'day3.png', '團康甩手功.png', 'day04.png', '強制參加團康活動.png',
-  '交友圈.png', '苦惱的我.png', '室友很煩.png', '想喝酒.png', '社工抓包.png', '職涯課.png',
-  '找工作.png', '社工推薦打掃工作.png', '給社工管錢.png', '沒錢了.png', '戒菸酒.png', '買飲料.png',
-  '翻包包.png', '租屋.png', '翻包2.png', '超時.png', 'Line按鈕.png','計點規則1.png','計點規則2.png',
-  '計點規則3.png','計點規則4.png','計點規則5.png',
-'計點規則6.png',
+      '開場白02.png', 'Line回覆更.png', '生活公約.png', '我已閱讀按鈕.png',
+      'day3.png', '團康甩手功.png', 'day04.png', '強制參加團康活動.png',
+      '交友圈.png', '苦惱的我.png', '室友很煩.png', '想喝酒.png', '社工抓包.png', '職涯課.png',
+      '找工作.png', '社工推薦打掃工作.png', '給社工管錢.png', '沒錢了.png', '戒菸酒.png', '買飲料.png',
+      '翻包包.png', '租屋.png', '翻包2.png', '超時.png', 'Line按鈕.png','計點規則1.png','計點規則2.png',
+      '計點規則3.png','計點規則4.png','計點規則5.png',
+      '計點規則6.png',
+      '戒菸酒.在.png' ,
+      "點擊螢幕前往下一步.png"// 確保這個圖片也在列表中
+    ];
+
+    const allVideos = [
+      'Line對話01.mp4', 'Line對話02.mp4' // 所有影片檔名
     ];
 
     const imageSteps = [
-  'Line回覆更.png',
-  '生活公約.png',
-  '計點規則1.png',
-  '計點規則2.png',
-  '計點規則3.png',
-  '計點規則4.png',
-  '計點規則5.png',
-  '計點規則6.png'
-];
+      'Line回覆更.png',
+      '生活公約.png',
+      '計點規則1.png',
+      '計點規則2.png',
+      '計點規則3.png',
+      '計點規則4.png',
+      '計點規則5.png',
+      '計點規則6.png'
+    ];
 
     const videoAfterImage = {
       'Line回覆更.png': 'Line對話02.mp4'
@@ -195,375 +238,463 @@
 
     let currentImageStep = 0;
 
+    // 獲取 DOM 元素
     const startScreen = document.getElementById('startScreen');
-    const video = document.getElementById('introVideo');
-    const imageStep = document.getElementById('imageStep');
-    const imageStepBtn = document.getElementById('imageStepBtn');
+    const introVideo = document.getElementById('introVideo'); // 影片元素
+    const imageStep = document.getElementById('imageStep'); // 圖片步驟容器
+    const imageStepBtn = document.getElementById('imageStepBtn'); // 圖片步驟的按鈕
+    const mainGameContainer = document.getElementById('mainGameContainer'); // 遊戲主容器
+    const speech = document.getElementById('speech'); // 對話框元素
+    const choices = document.getElementById('choices'); // 選擇按鈕容器元素
+    const loadingScreen = document.getElementById('loadingScreen');
+    const clickOverlay = document.getElementById('clickOverlay');
+    const backgroundImageElement = document.getElementById('background-image-element'); // 新增的背景圖片元素
 
+    // --- 輔助函數：切換背景圖片（移除淡入淡出）---
+    function setBackground(imageSrc, callback = () => {}) {
+        // 確保影片是隱藏的，以免與圖片重疊
+        introVideo.style.display = 'none';
+
+        // 直接設定 src，因為沒有淡出動畫
+        backgroundImageElement.src = imageSrc;
+        // 確保圖片顯示
+        // backgroundImageElement.classList.add('active'); // No longer needed if opacity is always 1
+
+        // 確保圖片載入完成後再執行回調
+        const onImageLoaded = () => {
+            backgroundImageElement.removeEventListener('load', onImageLoaded);
+            backgroundImageElement.removeEventListener('error', onImageLoaded);
+            callback(); // 圖片載入完成後執行回調
+        };
+
+        if (backgroundImageElement.complete) { // 如果圖片已經載入過
+            onImageLoaded();
+        } else {
+            backgroundImageElement.onload = onImageLoaded;
+            backgroundImageElement.onerror = onImageLoaded;
+        }
+    }
+
+    // --- 預載所有圖片和影片的函數 ---
+    function preloadAllAssets(images, videos, callback) {
+        let loadedCount = 0;
+        const totalAssets = images.length + videos.length;
+
+        if (totalAssets === 0) {
+            callback();
+            return;
+        }
+
+        const updateLoadingProgress = () => {
+            loadedCount++;
+            const progress = Math.floor((loadedCount / totalAssets) * 100);
+            loadingScreen.innerText = `載入中... ${progress}%`;
+            if (loadedCount === totalAssets) {
+                callback();
+            }
+        };
+
+        images.forEach(imgSrc => {
+            const img = new Image();
+            img.src = imgSrc;
+            img.onload = updateLoadingProgress;
+            img.onerror = updateLoadingProgress;
+        });
+
+        videos.forEach(vidSrc => {
+            const vid = document.createElement('video');
+            vid.src = vidSrc;
+            vid.onloadeddata = updateLoadingProgress; // 影片數據載入完成
+            vid.onerror = updateLoadingProgress;
+            vid.load(); // 開始載入影片
+        });
+    }
+
+    // --- 遊戲初始化與預載 ---
+    window.addEventListener('load', () => {
+        preloadAllAssets(allImages, allVideos, () => {
+            loadingScreen.style.opacity = 0;
+            loadingScreen.addEventListener('transitionend', () => {
+                loadingScreen.style.display = 'none';
+                startScreen.style.display = 'block';
+            }, { once: true });
+        });
+    });
+
+    // --- 開場畫面點擊事件 (保留原有邏輯) ---
     startScreen.addEventListener("click", () => {
-      preloadImages(allImages, () => {
-        startScreen.style.display = "none";
-        video.src = "Line對話1.mp4";
-        video.style.display = "block";
-        video.play();
-        video.onended = () => {
-          video.style.display = "none";
-          showNextImageStep();
+        startScreen.style.display = "none"; // 隱藏開場畫面
+        // backgroundImageElement.classList.remove('active'); // No longer needed if opacity is always 1
+
+        introVideo.src = "Line對話01.mp4"; // 影片檔名保留
+        introVideo.style.display = "block"; // 顯示影片
+        introVideo.play();
+
+        introVideo.onended = () => {
+            introVideo.style.display = "none"; // 影片播放結束後隱藏影片
+            showNextImageStep(); // 進入圖片步驟
         };
-      });
     });
 
+    // --- 顯示下一個圖片步驟 (修正同步顯示和按鈕) ---
     function showNextImageStep() {
-      if (currentImageStep < imageSteps.length) {
-        const currentImage = imageSteps[currentImageStep];
-        imageStep.style.backgroundImage = `url('${currentImage}')`;
-        imageStep.style.display = "block";
-        const customButtons = {
-  '生活公約.png': '我已閱讀按鈕.png',
-  'Line回覆更.png': 'Line按鈕.png',
-};
+        if (currentImageStep < imageSteps.length) {
+            const currentImageFilename = imageSteps[currentImageStep];
 
-imageStepBtn.src = customButtons[currentImage] || "點擊螢幕前往下一步.png";
-      } else {
-        imageStep.style.display = "none";
-        startScene();
-      }
+            // 確保對話框和按鈕在圖片顯示前隱藏
+            speech.style.display = 'none';
+            imageStepBtn.style.display = 'none';
+
+            // 設定背景圖片，在圖片載入完成後顯示文字和按鈕
+            setBackground(currentImageFilename, () => {
+                const customButtons = {
+                    '生活公約.png': '我已閱讀按鈕.png',
+                    'Line回覆更.png': 'Line按鈕.png',
+                };
+                // 設定按鈕的 src，保留 "點擊螢幕前往下一步.png" 作為預設
+                imageStepBtn.src = customButtons[currentImageFilename] || "點擊螢幕前往下一步.png";
+                imageStepBtn.style.display = "block"; // 顯示按鈕
+                imageStep.style.display = "block"; // 顯示圖片步驟容器（雖然現在只包含按鈕）
+
+            });
+        } else {
+            imageStep.style.display = "none"; // 隱藏圖片步驟容器
+            speech.style.display = "none"; // 隱藏對話框
+            imageStepBtn.style.display = "none"; // 隱藏按鈕
+            startScene(); // 進入主遊戲場景
+        }
     }
 
-    imageStepBtn.addEventListener("click", () => {
-      const currentImage = imageSteps[currentImageStep];
+    // --- 圖片步驟按鈕點擊事件 ---
+// --- 圖片步驟按鈕點擊事件 ---
+imageStepBtn.addEventListener("click", () => {
+    speech.style.display = 'none'; // 隱藏對話框
+    imageStepBtn.style.display = "none"; // 隱藏按鈕
+    imageStep.style.display = "none"; // 隱藏圖片步驟容器 (如果它有其他視覺作用)
 
-      if (videoAfterImage[currentImage]) {
-        imageStep.style.display = "none";
-        video.src = videoAfterImage[currentImage];
-        video.style.display = "block";
-        video.play();
-        video.onended = () => {
-          video.style.display = "none";
-          currentImageStep++;
-          showNextImageStep();
+    const currentImageFilename = imageSteps[currentImageStep];
+
+    if (videoAfterImage[currentImageFilename]) {
+        // 在播放影片之前，先將背景圖片元素隱藏
+        backgroundImageElement.style.display = 'none'; // 新增這行
+
+        introVideo.src = videoAfterImage[currentImageFilename]; // 影片檔名
+        introVideo.style.display = "block"; // 顯示影片
+        introVideo.play();
+
+        introVideo.onended = () => {
+            introVideo.style.display = "none"; // 影片播放結束後隱藏影片
+
+            currentImageStep++; // 進到下一個圖片步驟
+            const nextImageFilename = imageSteps[currentImageStep];
+
+            if (nextImageFilename) { // 確保還有下一個圖片步驟
+                // 設定下一個背景圖片，並在載入完成後顯示背景圖片元素
+                setBackground(nextImageFilename, () => {
+                    backgroundImageElement.style.display = 'block'; // 新增這行：圖片載入完成後顯示背景圖片元素
+                    // 這裡才是正確的呼叫位置！
+                    showNextImageStepContinue(); // <-- **直接呼叫這個函數**
+                });
+            } else {
+                // 如果沒有下一個圖片，直接隱藏所有相關元素並進入主遊戲
+                introVideo.style.display = "none";
+                backgroundImageElement.style.display = 'none'; // 如果是最後一步，確保背景圖片也隱藏
+                imageStep.style.display = "none";
+                speech.style.display = "none";
+                imageStepBtn.style.display = "none";
+                startScene(); // 進入主遊戲場景
+            }
         };
-      } else {
+    } else {
         currentImageStep++;
-        showNextImageStep();
-      }
-    });
-
-    function preloadImages(images, callback) {
-      let loaded = 0;
-      const total = images.length;
-      for (let i = 0; i < total; i++) {
-        const img = new Image();
-        img.src = images[i];
-        img.onload = img.onerror = () => {
-          loaded++;
-          if (loaded === total) callback();
-        };
-      }
+        showNextImageStep(); // 如果沒有影片，直接顯示下一個圖片步驟
     }
+});
 
-    function startScene() {
-      goTo("accept");
-    }
+// 新增一個輔助函數來處理 showNextImageStep 的後續邏輯
+// 這個函數的定義應該在外面，不要被嵌套在其他函數內部
+function showNextImageStepContinue() {
+    const currentImageFilename = imageSteps[currentImageStep];
+    const customButtons = {
+        '生活公約.png': '我已閱讀按鈕.png',
+        'Line回覆更.png': 'Line按鈕.png',
+    };
+    imageStepBtn.src = customButtons[currentImageFilename] || "點擊螢幕前往下一步.png";
+    imageStepBtn.style.display = "block"; // 顯示按鈕
+    imageStep.style.display = "block"; // 確保圖片步驟容器也顯示
+}
 
-    const scenes = {
-      accept: {
-        bg: 'day3.png',
-        speech: '當你第一次踏進安置機構，印入眼簾的這棟雙層樓的老屋，鐵皮屋頂鏽蝕、牆面斑駁，但中庭寬闊，四周圍繞著寢室。房內擺滿雙層床，金屬床架沿牆排開，有些還空著，有些則堆滿個人物品、塑膠袋、衣服與掛在梯子上的外套，空間顯得擁擠而充滿生活感。這裡或許稱不上舒適，但至少給了你一張床、一個棲身之所。對你來說，一切還很陌生，還不太知道該怎麼開始新的生活。',
-        choices: [
-          { text: '決定先觀察一陣子，獨自在房間休息', next: 'bbb' },
-          { text: '趕快嘗試看看能不能適應新生活', next: 'aaa' }
-        ]
-      },
-      aaa: {
-        bg: '團康甩手功.png',
-        speech: '吃完早餐，社工公布今天的活動內容，例行的打掃、做早操、做簡單的手工品。有些人已經開始動作，我卻還坐在角落。不清楚這些安排對我有沒有幫助，而且我還不太認識這邊的其他住民和生活輔導員⋯⋯',
-        choices: [
-          { text: '不願參加，找理由推託', next: 'ddd' },
-          { text: '勉強參加，但覺得無聊', next: 'ccc' }
-        ]
-      },
-      bbb: {
-        bg: 'day04.png',
-        speech: '今天是團體活動時間，我只想待在房間休息。剛躺下，生活輔導員就在門口催促我：「該去做打掃和做操了，大家都在等你。」我知道這是規定，但真的不太想和別人混在一起。',
-        choices: [
-          { text: '草草應付參加活動', next: 'ccc' },
-          { text: '拒絕並表現不滿', next: 'ddd' }
-        ]
-      },
-      ddd: {
-        bg: '強制參加團康活動.png',
-        speech: '生活輔導員擋在活動室門口，年紀看起來比你還小，卻語氣強硬：「規定就是規定，每個人都要參加團康活動。」他語調平淡卻不容質疑，手指向裡頭擺動，像是在催促你趕快進去。生輔員用這種態度對你頤指氣使，你心裡一陣不舒服⋯⋯',
-        choices: [
-          { text: '壓下情緒，走進活動室', next: 'b2' },
-          { text: '被他那語氣惹毛，懶得理會', next: 'ggg' }
-        ]
-      },
-      ggg: {
-        bg: '苦惱的我.png',
-        speech: '你受不了機構的制度與規範，每天都像被困住一樣。你找了負責的社工，遞出了主動離宿的申請。當一切手續辦妥，你帶著簡單的行李離開，踏上了未知的街頭。',
-        choices: [
-          { text: '受不了制度管束，決定離開', next: 'b1' },
-        ]
-      },
-      b1: {
-        bg: '苦惱的我.png',
-        speech: '離開機構已經兩三個月，重新回到街頭的生活比之前更艱難。夜晚寒冷刺骨，身體也因長期勞累而愈發疲憊。街頭的生活比記憶中更苦、更不堪。於是，你決定聯絡社工，申請回到機構，再給自己一次機會。',
-        choices: [
-          { text: '回到機構，再試試看努力脫離街頭生活❗ 計一點', next: 'jjj' },
-        ]
-      },
-      ccc: {
-        bg: '交友圈.png',
-        speech: '生活輔導員發現你在團體活動時間躲在房間，這讓你感到更孤立無援。你試著草草應付參加活動，但大家早已結成交友圈。你注意到機構裡的人三三兩兩都有自己的交友圈，吃飯有人陪、晚上有人聊天，只有你總是一個人。不是沒試著加入過，只是話題你聽不懂、氣氛也插不進去。那股被孤立的感覺越來越重，這樣的孤單，讓你開始動搖⋯⋯',
-        choices: [
-          { text: '躲回原本的生活習慣，依舊獨自一人', next: 'lll' },
-          { text: '試著融入他們', next: 'mmm' }
-        ]
-      },
-      b2: {
-        bg: '交友圈.png',
-        speech: '生活輔導員強硬要求你參與活動，你強忍不滿勉強跟著去。你發現大家早已形成交友圈，彼此之間默契十足。你注意到機構裡的人三三兩兩都有自己的交友圈，吃飯有人陪、晚上有人聊天，只有你總是一個人。不是沒試著加入過，只是話題你聽不懂、氣氛也插不進去。那股被孤立的感覺越來越重，這樣的孤單，讓你開始動搖⋯⋯',
-        choices: [
-          { text: '躲回原本的生活習慣，依舊獨自一人', next: 'lll' },
-          { text: '試著融入他們', next: 'mmm' }
-        ]
-      },
-      jjj: {
-        bg: '室友很煩.png',
-        speech: '你和一名室友共用一個房間，但他晚上總是不睡覺，一直抱怨社會的不公平和生活的艱辛。聲音讓你難以入眠，心情也漸漸煩躁。',
-        choices: [
-          { text: '試圖溝通，你決定跟室友談談', next: 'b7' },
-          { text: '逃避與人相處，自己找地方冷靜自己找地方冷靜，暫時避免正面衝突', next: 'lll' }
-        ]
-      },
-      lll: {
-        bg: '想喝酒.png',
-        speech: '你的室友晚上總是不睡覺，還不停抱怨社會，讓你煩不勝煩，只想躲開人群，獨自度過時間。過去街頭生活時，你染上菸酒癮，靠菸酒稍稍緩解孤獨和身體的不適，但在這裡這些都被禁止。此刻你很想喝酒解悶，掙扎著到底是忍住，還是偷偷喝一點，讓自己暫時放鬆⋯⋯',
-        choices: [
-          { text: '偷喝一點，解解悶也好', next: 'ppp' },
-          { text: '忍住，反正這裡不能碰酒，硬撐一下', next: 'mmm' }
-        ]
-      },
-      ppp: {
-        bg: '社工抓包.png',
-        speech: '你已經觸犯生活公約⚠️',
-        choices: [
-          { text: '選擇留下 ❗ 計一點', next: 'b4' },
-          { text: '受不了制度管束，主動決定離開', next: 'b8' }
-        ]
-      },
-      b8: {
-        bg: '苦惱的我.png',
-        speech: '離開機構已經兩三個月，重新回到街頭的生活比之前更艱難。夜晚寒冷刺骨，身體也因長期勞累而愈發疲憊。街頭的生活比記憶中更苦、更不堪。於是，你決定聯絡社工，申請回到機構，再給自己一次機會。',
-        choices: [
-          { text: '回到機構，再試試看努力脫離街頭生活❗ 計一點', next: 'mmm' },
-        ]
-      },
-      mmm: {
-        bg: '職涯課.png',
-        speech: '某天下午，社工坐到你對面，語氣認真地說：「這門職能課你應該考慮看看，對現在的你會有幫助。」課程教的是簡單烹飪、環保清潔、倉儲搬運這類比較好上手的工作技能。他強調這是重新進入職場的一個起點，很多人上完課真的找到工作。你最近努力戒酒，想把生活慢慢拉回正軌。你點點頭，但你也聽說外面有些工作自由、薪水更好——如果自己去找，會不會更適合你現在的狀況？',
-        choices: [
-          { text: '拒絕參加，想自己去外面找工作', next: 'ttt' },
-          { text: '接受安排，努力表現', next: 'uuu' }
-        ]
-      },
-      b5: {
-        bg: '職涯課.png',
-        speech: '某天下午，社工坐到你對面，語氣認真地說：「這門職能課你應該考慮看看，對現在的你會有幫助。」課程教的是簡單烹飪、環保清潔、倉儲搬運這類比較好上手的工作技能。他強調這是重新進入職場的一個起點，很多人上完課真的找到工作。你離開機構兩三個月，經歷街頭的苦難後，決定再給自己一次機會。你點點頭，但你也聽說外面有些工作自由、薪水更好——如果自己去找，會不會更適合你現在的狀況？',
-        choices: [
-          { text: '拒絕參加，想自己去外面找工作', next: 'ttt' },
-          { text: '接受安排，努力表現', next: 'uuu' }
-        ]
-      },
-      b4: {
-        bg: '職涯課.png',
-        speech: '某天下午，社工坐到你對面，語氣認真地說：「這門職能課你應該考慮看看，對現在的你會有幫助。」課程教的是簡單烹飪、環保清潔、倉儲搬運這類比較好上手的工作技能。他強調這是重新進入職場的一個起點，很多人上完課真的找到工作。你最近偷喝了點酒，被社工稍微提醒了。你點點頭，但你也聽說外面有些工作自由、薪水更好——如果自己去找，會不會更適合你現在的狀況？',
-        choices: [
-          { text: '拒絕參加，想自己去外面找工作', next: 'ttt' },
-          { text: '接受安排，努力表現', next: 'uuu' }
-        ]
-      },
-     b7 : {
-        bg: '職涯課.png',
-        speech: '某天下午，社工坐到你對面，語氣認真地說：「這門職能課你應該考慮看看，對現在的你會有幫助。」課程教的是簡單烹飪、環保清潔、倉儲搬運這類比較好上手的工作技能。他強調這是重新進入職場的一個起點，很多人上完課真的找到工作。雖然室友吵得讓你心煩，你還是願意聽聽社工的建議。你點點頭，但你也聽說外面有些工作自由、薪水更好——如果自己去找，會不會更適合你現在的狀況？',
-        choices: [
-          { text: '拒絕參加，想自己去外面找工作', next: 'ttt' },
-          { text: '接受安排，努力表現', next: 'uuu' }
-        ]
-      },
-      ttt: {
-        bg: '找工作.png',
-        speech: '你決定先不參加職能課，試著自己去市區找工作。每天一早出門，搭車進城，問了好幾家搬運廠和清潔公司，不是嫌你腿腳不方便，就是說年紀太大。住的安置機構離市區遠，回程還得抓緊時間，不然趕不上門禁，要晚歸還得先和社工申請，來回折騰。就算晚上有地方睡、不用露宿街頭，你發現這樣找工作並沒有比較容易。',
-        choices: [
-          { text: '找不到工作，決定回到機構', next: 'b9' }
-        ]
-      },
-      b9: {
-        bg: '社工推薦打掃工作.png',
-        speech: '經過一陣子自己找工作沒著落後，你決定回到安置機構。社工安排你成為機構的清潔工，每天你負責清掃不同樓層，雖然工作辛苦，讓你感受到穩定的生活節奏，但這份工作對你的身體負荷也很大，時常讓你感到疲憊。',
-        choices: [
-          { text: '你每天清掃不同樓層，雖然辛苦，還是撐了下來。', next: 'zzz' }
-        ]
-      },
-      uuu: {
-        bg: '社工推薦打掃工作.png',
-        speech: '你在機構內的職場見習表現良好，社工因此安排你成為機構的清潔工。每天你負責清掃不同樓層，雖然工作辛苦，讓你感受到穩定的生活節奏，但這份工作對你的身體負荷也很大，時常讓你感到疲憊。',
-        choices: [
-          { text: '你每天清掃不同樓層，雖然辛苦，還是撐了下來。', next: 'zzz' }
-        ]
-      },
-      zzz: {
-        bg: '給社工管錢.png',
-        speech: '你靠著清潔工的工作，慢慢存下了一些錢。某天，社工提議幫你開戶，說這樣比較安全，也方便規劃金錢使用。還說，如果你願意，也可以選擇讓他們代管，或是自己保管但要定期讓他們了解金錢流向。「不是要限制你，而是希望你慢慢建立使用金錢的習慣，將來比較好生活。」你點點頭，但心裡不免猶豫──錢是你辛苦賺來的，真的要讓人過問嗎？',
-        choices: [
-          { text: '拒絕，不想讓別人管自己怎麼花錢', next: 'a1' },
-          { text: '配合開戶，嘗試建立穩定的金錢規劃', next: 'a2' }
-        ]
-      },
-      a1: {
-        bg: '沒錢了.png',
-        speech: '你還是拒絕了社工的建議，覺得錢自己存、自己花才自在。但沒過多久，你領了薪水就放身上，每次出門都不小心多花一些。街頭時養成「有錢先用」的習慣，讓你不知不覺把一點一滴存下來的錢，全花光了。你開始懊惱，當初是不是太快拒絕那個開戶的機會了。',
-        choices: [
-          { text: '再次找社工，申請開戶與金錢管理', next: 'a2' }
-        ]
-      },
-      a2: {
-        bg: '戒菸酒.png',
-        speech: '你開始試著重建生活，盡力把注意力從酒和香菸上移開。每天打掃完回到房間，就早點休息、不讓自己太閒。偶爾還是會想起過去在街頭，一有錢就拿去換成酒精或煙霧的習慣，但你提醒自己不能再那樣過下去。雖然戒斷的日子不好熬，但在一次次克制中，你感覺生活慢慢穩定下來了。',
-        autoNext: 'a3',
-        choices: []
-      },
-      a3: {
-        bg: '買飲料.png',
-        speech: '你的生活漸漸穩定，雖然工作不輕鬆，但你已逐漸適應，酒菸也慢慢戒掉。有時下班後，你會申請短暫離開機構，買杯飲料，在外頭巷口走走。有時會捨不得這麼早回去，但門禁時間快到了⋯⋯',
-        choices: [
-          { text: '依約時間返回機構', next: 'a4' },
-          { text: '無視門禁時間，在巷口散步', next: 'a5' }
-        ]
-      },
-      a4: {
-        bg: '翻包包.png',
-        speech: '你依約時間返回機構，社工依規定請你配合搜身，檢查是否攜帶違禁品。雖然你知道住在安置機構是接受政府和社會的幫助，但你仍覺得自己應該保有基本的生活隱私和尊嚴。這樣的檢查，讓你感受到一絲壓迫與不舒服。',
-        choices: [
-          { text: '配合搜身', next: 'a6' },
-          { text: '即使會被記點，仍拒絕搜身', next: 'a9' }
-        ]
-      },
-      a6: {
-        bg: '租屋.png',
-        speech: '從努力參與職場見習，接下機構內的清潔工作，生活逐漸有了規律。一開始很難，但你慢慢撐下來了。',
-        autoNext: 'a20',
-        choices: []
-      },
-      a20: {
-        bg: '租屋.png',
-        speech: '你學會如何安排自己的收入，也逐漸存下一筆錢。',
-        autoNext: 'a21',
-        choices: []
-      },
-      a21: {
-        bg: '租屋.png',
-        speech: '幾個月後，在社工的協助下，找到一份機構外的穩定工作，收入也能順利租下一間小套房。',
-        autoNext: 'a22',
-        choices: []
-      },
-      a22: {
-        bg: '租屋.png',
-        speech: '拉著行李站在人來人往的街口時，你忽然有了自己成功脫遊的實感——',
-        autoNext: 'a23',
-        choices: []
-      },
-      a23: {<!-- 綠色結局 -->
-        bg: '租屋.png',
-        speech: '自己終於離開了那段過渡時期，重新走回屬於自己的生活。',
-        autoNext: 'a24',
-        choices: []
-      },
-      a5: {
-        bg: '超時.png',
-        speech: '你知道這裡有門禁，但那天實在太煩了。只是想出去透透氣，不會走遠，也不會太久，應該不會被發現。於是你走到巷口，抽了根菸，讓腦袋清一下。回來時，門口燈還亮著，夜班警衛靠在牆邊，手插著口袋，看見你時臉上一點表情都沒有。他掃了你一眼，只淡淡地說：「超時，記一點。」',
-        choices: [
-          { text: '你沒回話❗ 計一點', next: 'a8' },
-        ]
-      },
-      a8: {
-        bg: '翻包包.png',
-        speech: '社工依規定請你配合搜身，檢查是否攜帶違禁品。雖然你知道住在安置機構是接受政府和社會的幫助，但你仍覺得自己應該保有基本的生活隱私和尊嚴。這樣的檢查，讓你感受到一絲壓迫與不舒服。',
-        choices: [
-          { text: '配合搜身', next: 'a6' },
-          { text: '即使會被記點，仍拒絕搜身', next: 'a9' }
-        ]
-      },
-      a9: {
-        bg: '翻包2.png',
-        speech: '你不想配合搜身。不是因為帶了什麼，只是心裡過不去那道線。',
-        choices: [
-          { text: '選擇留下，讓他們記點❗ 計一點', next: 'a10' },
-          { text: '你覺得這樣的生活不是你要的，決定離開，再次回到街頭', next: 'a11' }
-        ]
-      },
-     a10: {
-        bg: '租屋.png',
-        speech: '你還是選擇留下，並讓社工幫忙存款。慢慢的你存到一筆存款，足夠去外面租房。在社工的幫助下你找到機構外的工作，透過安置機構的輔助，恢復職能，重建自立生活。',
-        choices: []
-      },
-    a11: {
-        bg: '租屋.png',
-        speech: '那些規定與約束還是讓你喘不過氣，你再次向社工提出申請，說明自己想離開。',
-        autoNext: 'a12',
-        choices: []
-      },
-     a12: {
-        bg: '租屋.png',
-        speech: '這一次，社工沒有多說什麼，你整理好簡單的行李，離開了機構。',
-        autoNext: 'a13',
-        choices: []
-      },
-    a13: {
-        bg: '租屋.png',
-        speech: '回到街頭後的日子依然困苦，天氣一樣寒冷，找工作還是困難重重，身體也時不時出狀況。',
-        autoNext: 'a14',
-        choices: []
-      },
-    a14: {
-        bg: '租屋.png',
-        speech: '但這一次，少了規定的早晚點名、少了行為被監督的壓力，少了那些讓你覺得不自在的制度，你反而感到一點輕鬆。',
-        autoNext: 'a15',
-        choices: []
-      },
-    a16: {<!-- 回到街頭 -->
-        bg: '租屋.png',
-        speech: '回到你熟悉的街頭，繼續過自由自在的日子。',
-        autoNext: 'a17',
-        choices: []
-      },
-      
+// 請確保 setBackground 函數是這樣：
+// --- 輔助函數：切換背景圖片（移除淡入淡出）---
+function setBackground(imageSrc, callback = () => {}) {
+    introVideo.style.display = 'none'; // 確保影片是隱藏的，以免與圖片重疊
+    // backgroundImageElement.style.display = 'block'; // 這裡不需要設置 display，在調用處控制
+
+    backgroundImageElement.src = imageSrc;
+    const onImageLoaded = () => {
+        backgroundImageElement.removeEventListener('load', onImageLoaded);
+        backgroundImageElement.removeEventListener('error', onImageLoaded);
+        callback(); // 圖片載入完成後執行回調
     };
 
-    function goTo(key) {
-      const scene = scenes[key];
-      const game = document.getElementById('game');
-      const speech = document.getElementById('speech');
-      const choices = document.getElementById('choices');
-      const overlay = document.getElementById('clickOverlay');
+    if (backgroundImageElement.complete) {
+        onImageLoaded();
+    } else {
+        backgroundImageElement.onload = onImageLoaded;
+        backgroundImageElement.onerror = onImageLoaded;
+    }
+}
 
-      game.style.backgroundImage = `url('${scene.bg}')`;
-      speech.innerText = scene.speech;
-      overlay.style.display = 'none';
-      overlay.onclick = null;
+    // --- 進入主遊戲場景的開頭 (保留原有邏輯) ---
+    function startScene() {
+        goTo("accept");
+    }
 
-      if (scene.choices.length > 0) {
-        choices.innerHTML = scene.choices.map(choice =>
-          `<button class="btn" onclick="goTo('${choice.next}')">${choice.text}</button>`
-        ).join('');
-      } else {
-        choices.innerHTML = '<div style="color: white; font-size: 14px;">（點擊畫面繼續）</div>';
-        overlay.style.display = 'block';
-        overlay.onclick = () => {
-          goTo(scene.autoNext || 'start');
-        };
+    // --- 場景資料 (完全保留不變) ---
+    const scenes = {
+ 
+ accept: {
+         bg: 'day3.png',
+         speech: '當你第一次踏進安置機構，印入眼簾的這棟雙層樓的老屋，鐵皮屋頂鏽蝕、牆面斑駁，但中庭寬闊，四周圍繞著寢室。房內擺滿雙層床，金屬床架沿牆排開，有些還空著，有些則堆滿個人物品、塑膠袋、衣服與掛在梯子上的外套，空間顯得擁擠而充滿生活感。這裡或許稱不上舒適，但至少給了你一張床、一個棲身之所。對你來說，一切還很陌生，還不太知道該怎麼開始新的生活。',
+         choices: [
+           { text: '決定先觀察一陣子，獨自在房間休息', next: 'bbb' },
+           { text: '趕快嘗試看看能不能適應新生活', next: 'aaa' }
+         ]
+       },
+       aaa: {
+         bg: '團康甩手功.png',
+         speech: '吃完早餐，社工公布今天的活動內容，例行的打掃、做早操、做簡單的手工品。有些人已經開始動作，我卻還坐在角落。不清楚這些安排對我有沒有幫助，而且我還不太認識這邊的其他住民和生活輔導員⋯⋯',
+         choices: [
+           { text: '不願參加，找理由推託', next: 'ddd' },
+           { text: '勉強參加，但覺得無聊', next: 'ccc' }
+         ]
+       },
+       bbb: {
+         bg: 'day04.png',
+         speech: '今天是團體活動時間，我只想待在房間休息。剛躺下，生活輔導員就在門口催促我：「該去做打掃和做操了，大家都在等你。」我知道這是規定，但真的不太想和別人混在一起。',
+         choices: [
+           { text: '草草應付參加活動', next: 'ccc' },
+           { text: '拒絕並表現不滿', next: 'ddd' }
+         ]
+       },
+       ddd: {
+         bg: '強制參加團康活動.png',
+         speech: '生活輔導員擋在活動室門口，年紀看起來比你還小，卻語氣強硬：「規定就是規定，每個人都要參加團康活動。」他語調平淡卻不容質疑，手指向裡頭擺動，像是在催促你趕快進去。生輔員用這種態度對你頤指氣使，你心裡一陣不舒服⋯⋯',
+         choices: [
+           { text: '壓下情緒，走進活動室', next: 'b2' },
+           { text: '被他那語氣惹毛，懶得理會', next: 'ggg' }
+         ]
+       },
+       ggg: {
+         bg: '苦惱的我.png',
+         speech: '你受不了機構的制度與規範，每天都像被困住一樣。你找了負責的社工，遞出了主動離宿的申請。當一切手續辦妥，你帶著簡單的行李離開，踏上了未知的街頭。',
+         choices: [
+           { text: '受不了制度管束，決定離開', next: 'b1' },
+         ]
+       },
+       b1: {
+         bg: '苦惱的我.png',
+         speech: '離開機構已經兩三個月，重新回到街頭的生活比之前更艱難。夜晚寒冷刺骨，身體也因長期勞累而愈發疲憊。街頭的生活比記憶中更苦、更不堪。於是，你決定聯絡社工，申請回到機構，再給自己一次機會。',
+         choices: [
+           { text: '回到機構，再試試看努力脫離街頭生活❗ 計一點', next: 'jjj' },
+         ]
+       },
+       ccc: {
+         bg: '交友圈.png',
+         speech: '生活輔導員發現你在團體活動時間躲在房間，這讓你感到更孤立無援。你試著草草應付參加活動，但大家早已結成交友圈。你注意到機構裡的人三三兩兩都有自己的交友圈，吃飯有人陪、晚上有人聊天，只有你總是一個人。不是沒試著加入過，只是話題你聽不懂、氣氛也插不進去。那股被孤立的感覺越來越重，這樣的孤單，讓你開始動搖⋯⋯',
+         choices: [
+           { text: '躲回原本的生活習慣，依舊獨自一人', next: 'lll' },
+           { text: '試著融入他們', next: 'mmm' }
+         ]
+       },
+       b2: {
+         bg: '交友圈.png',
+         speech: '生活輔導員強硬要求你參與活動，你強忍不滿勉強跟著去。你發現大家早已形成交友圈，彼此之間默契十足。你注意到機構裡的人三三兩兩都有自己的交友圈，吃飯有人陪、晚上有人聊天，只有你總是一個人。不是沒試著加入過，只是話題你聽不懂、氣氛也插不進去。那股被孤立的感覺越來越重，這樣的孤單，讓你開始動搖⋯⋯',
+         choices: [
+           { text: '躲回原本的生活習慣，依舊獨自一人', next: 'lll' },
+           { text: '試著融入他們', next: 'mmm' }
+         ]
+       },
+       jjj: {
+         bg: '室友很煩.png',
+         speech: '你和一名室友共用一個房間，但他晚上總是不睡覺，一直抱怨社會的不公平和生活的艱辛。聲音讓你難以入眠，心情也漸漸煩躁。',
+         choices: [
+           { text: '試圖溝通，你決定跟室友談談', next: 'b7' },
+           { text: '逃避與人相處，自己找地方冷靜自己找地方冷靜，暫時避免正面衝突', next: 'lll' }
+         ]
+       },
+       lll: {
+         bg: '想喝酒.png',
+         speech: '你的室友晚上總是不睡覺，還不停抱怨社會，讓你煩不勝煩，只想躲開人群，獨自度過時間。過去街頭生活時，你染上菸酒癮，靠菸酒稍稍緩解孤獨和身體的不適，但在這裡這些都被禁止。此刻你很想喝酒解悶，掙扎著到底是忍住，還是偷偷喝一點，讓自己暫時放鬆⋯⋯',
+         choices: [
+           { text: '偷喝一點，解解悶也好', next: 'ppp' },
+           { text: '忍住，反正這裡不能碰酒，硬撐一下', next: 'mmm' }
+         ]
+       },
+       ppp: {
+         bg: '社工抓包.png',
+         speech: '你已經觸犯生活公約⚠️',
+         choices: [
+           { text: '選擇留下 ❗ 計一點', next: 'b4' },
+           { text: '受不了制度管束，主動決定離開', next: 'b8' }
+         ]
+       },
+       b8: {
+         bg: '苦惱的我.png',
+         speech: '離開機構已經兩三個月，重新回到街頭的生活比之前更艱難。夜晚寒冷刺骨，身體也因長期勞累而愈發疲憊。街頭的生活比記憶中更苦、更不堪。於是，你決定聯絡社工，申請回到機構，再給自己一次機會。',
+         choices: [
+           { text: '回到機構，再試試看努力脫離街頭生活❗ 計一點', next: 'mmm' },
+         ]
+       },
+       mmm: {
+         bg: '職涯課.png',
+         speech: '某天下午，社工坐到你對面，語氣認真地說：「這門職能課你應該考慮看看，對現在的你會有幫助。」課程教的是簡單烹飪、環保清潔、倉儲搬運這類比較好上手的工作技能。他強調這是重新進入職場的一個起點，很多人上完課真的找到工作。你最近努力戒酒，想把生活慢慢拉回正軌。你點點頭，但你也聽說外面有些工作自由、薪水更好——如果自己去找，會不會更適合你現在的狀況？',
+         choices: [
+           { text: '拒絕參加，想自己去外面找工作', next: 'ttt' },
+           { text: '接受安排，努力表現', next: 'uuu' }
+         ]
+       },
+       b5: {
+         bg: '職涯課.png',
+         speech: '某天下午，社工坐到你對面，語氣認真地說：「這門職能課你應該考慮看看，對現在的你會有幫助。」課程教的是簡單烹飪、環保清潔、倉儲搬運這類比較好上手的工作技能。他強調這是重新進入職場的一個起點，很多人上完課真的找到工作。你離開機構兩三個月，經歷街頭的苦難後，決定再給自己一次機會。你點點頭，但你也聽說外面有些工作自由、薪水更好——如果自己去找，會不會更適合你現在的狀況？',
+         choices: [
+           { text: '拒絕參加，想自己去外面找工作', next: 'ttt' },
+           { text: '接受安排，努力表現', next: 'uuu' }
+         ]
+       },
+       b4: {
+         bg: '職涯課.png',
+         speech: '某天下午，社工坐到你對面，語氣認真地說：「這門職能課你應該考慮看看，對現在的你會有幫助。」課程教的是簡單烹飪、環保清潔、倉儲搬運這類比較好上手的工作技能。他強調這是重新進入職場的一個起點，很多人上完課真的找到工作。你最近偷喝了點酒，被社工稍微提醒了。你點點頭，但你也聽說外面有些工作自由、薪水更好——如果自己去找，會不會更適合你現在的狀況？',
+         choices: [
+           { text: '拒絕參加，想自己去外面找工作', next: 'ttt' },
+           { text: '接受安排，努力表現', next: 'uuu' }
+         ]
+       },
+      b7 : {
+         bg: '職涯課.png',
+         speech: '某天下午，社工坐到你對面，語氣認真地說：「這門職能課你應該考慮看看，對現在的你會有幫助。」課程教的是簡單烹飪、環保清潔、倉儲搬運這類比較好上手的工作技能。他強調這是重新進入職場的一個起點，很多人上完課真的找到工作。雖然室友吵得讓你心煩，你還是願意聽聽社工的建議。你點點頭，但你也聽說外面有些工作自由、薪水更好——如果自己去找，會不會更適合你現在的狀況？',
+         choices: [
+           { text: '拒絕參加，想自己去外面找工作', next: 'ttt' },
+           { text: '接受安排，努力表現', next: 'uuu' }
+         ]
+       },
+       ttt: {
+         bg: '找工作.png',
+         speech: '你決定先不參加職能課，試著自己去市區找工作。每天一早出門，搭車進城，問了好幾家搬運廠和清潔公司，不是嫌你腿腳不方便，就是說年紀太大。住的安置機構離市區遠，回程還得抓緊時間，不然趕不上門禁，要晚歸還得先和社工申請，來回折騰。就算晚上有地方睡、不用露宿街頭，你發現這樣找工作並沒有比較容易。',
+         choices: [
+           { text: '找不到工作，決定回到機構', next: 'b9' }
+         ]
+       },
+       b9: {
+         bg: '社工推薦打掃工作.png',
+         speech: '經過一陣子自己找工作沒著落後，你決定回到安置機構。社工安排你成為機構的清潔工，每天你負責清掃不同樓層，雖然工作辛苦，讓你感受到穩定的生活節奏，但這份工作對你的身體負荷也很大，時常讓你感到疲憊。',
+         choices: [
+           { text: '你每天清掃不同樓層，雖然辛苦，還是撐了下來。', next: 'zzz' }
+         ]
+       },
+       uuu: {
+         bg: '社工推薦打掃工作.png',
+         speech: '你在機構內的職場見習表現良好，社工因此安排你成為機構的清潔工。每天你負責清掃不同樓層，雖然工作辛苦，讓你感受到穩定的生活節奏，但這份工作對你的身體負荷也很大，時常讓你感到疲憊。',
+         choices: [
+           { text: '你每天清掃不同樓層，雖然辛苦，還是撐了下來。', next: 'zzz' }
+         ]
+       },
+       zzz: {
+         bg: '給社工管錢.png',
+         speech: '你靠著清潔工的工作，慢慢存下了一些錢。某天，社工提議幫你開戶，說這樣比較安全，也方便規劃金錢使用。還說，如果你願意，也可以選擇讓他們代管，或是自己保管但要定期讓他們了解金錢流向。「不是要限制你，而是希望你慢慢建立使用金錢的習慣，將來比較好生活。」你點點頭，但心裡不免猶豫──錢是你辛苦賺來的，真的要讓人過問嗎？',
+         choices: [
+           { text: '拒絕，不想讓別人管自己怎麼花錢', next: 'a1' },
+           { text: '配合開戶，嘗試建立穩定的金錢規劃', next: 'a2' }
+         ]
+       },
+       a1: {
+         bg: '沒錢了.png',
+         speech: '你還是拒絕了社工的建議，覺得錢自己存、自己花才自在。但沒過多久，你領了薪水就放身上，每次出門都不小心多花一些。街頭時養成「有錢先用」的習慣，讓你不知不覺把一點一滴存下來的錢，全花光了。你開始懊惱，當初是不是太快拒絕那個開戶的機會了。',
+         choices: [
+           { text: '再次找社工，申請開戶與金錢管理', next: 'a2' }
+         ]
+       },
+       a2: {
+         bg: '戒菸酒.png',
+         speech: '你開始試著重建生活，盡力把注意力從酒和香菸上移開。每天打掃完回到房間，就早點休息、不讓自己太閒。偶爾還是會想起過去在街頭，一有錢就拿去換成酒精或煙霧的習慣，但你提醒自己不能再那樣過下去。雖然戒斷的日子不好熬，但在一次次克制中，你感覺生活慢慢穩定下來了。',
+         autoNext: 'a3',
+         choices: []
+       },
+       a3: {
+         bg: '買飲料.png',
+         speech: '你的生活漸漸穩定，雖然工作不輕鬆，但你已逐漸適應，酒菸也慢慢戒掉。有時下班後，你會申請短暫離開機構，買杯飲料，在外頭巷口走走。有時會捨不得這麼早回去，但門禁時間快到了⋯⋯',
+         choices: [
+           { text: '依約時間返回機構', next: 'a4' },
+           { text: '無視門禁時間，在巷口散步', next: 'a5' }
+         ]
+       },
+       a4: {
+         bg: '翻包包.png',
+         speech: '你依約時間返回機構，社工依規定請你配合搜身，檢查是否攜帶違禁品。雖然你知道住在安置機構是接受政府和社會的幫助，但你仍覺得自己應該保有基本的生活隱私和尊嚴。這樣的檢查，讓你感受到一絲壓迫與不舒服。',
+         choices: [
+           { text: '配合搜身', next: 'a6' },
+           { text: '拒絕配合', next: 'a7' }
+         ]
+       },
+       a6: {
+         bg: '租屋.png',
+         speech: '慢慢的你存到一筆存款，足夠去外面租房。在社工的幫助下你找到機構外的工作，透過安置機構的輔助，恢復職能，重建自立生活。',
+         choices: []
+       },
+       a7: {
+         bg: '翻包2.png',
+         speech: '對於搜身，你決定⋯⋯',
+         choices: [
+           { text: '選擇留下❗ 計一點', next: 'a8' },
+           { text: '覺得受不了制度管束 ，選擇離開機構回到街頭', next: 'a9' }
+         ]
+       },
+       a5: {
+         bg: '超時.png',
+         speech: '由於外出超過門禁時間，你決定⋯⋯',
+         choices: [
+           { text: '選擇留下❗ 計一點', next: 'a8' },
+           { text: '覺得受不了制度管束 ，選擇離開機構回到街頭', next: 'a9' }
+         ]
+       },
       }
+
+    // --- 核心函數：切換遊戲場景顯示 ---
+    function goTo(key) {
+        const scene = scenes[key];
+
+        // 在切換背景之前，先隱藏所有內容，準備顯示新的場景
+        speech.style.display = 'none';
+        choices.style.display = 'none';
+        clickOverlay.style.display = 'none';
+        clickOverlay.onclick = null;
+        imageStep.style.display = 'none'; // 隱藏圖片步驟容器
+        imageStepBtn.style.display = 'none'; // 隱藏圖片步驟按鈕
+        introVideo.style.display = 'none'; // 確保影片隱藏
+
+        // 設定新的背景圖片，並在圖片載入完成後顯示文字和按鈕
+        setBackground(scene.bg, () => {
+            speech.innerText = scene.speech;
+            speech.style.display = 'block'; // 顯示對話框
+
+            if (scene.choices.length > 0) {
+                choices.innerHTML = scene.choices.map(choice =>
+                  `<button class="btn" onclick="goTo('${choice.next}')">${choice.text}</button>`
+                ).join('');
+                choices.style.display = 'block'; // 顯示選項按鈕
+            } else if (scene.autoNext) {
+                // 如果沒有選項但有 autoNext，顯示點擊提示，並啟用點擊層
+                choices.innerHTML = '<div style="color: white; font-size: 14px; margin-top: 10px;">（點擊畫面繼續）</div>';
+                choices.style.display = 'block';
+                clickOverlay.style.display = 'block';
+                clickOverlay.onclick = () => {
+                    goTo(scene.autoNext);
+                };
+            } else {
+                // 遊戲結束場景 (例如 a6)，清空按鈕，讓畫面保持純背景
+                choices.innerHTML = '';
+            }
+        });
     }
   </script>
 </body>
