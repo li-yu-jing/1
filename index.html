@@ -206,7 +206,7 @@
 
   <script>
     const allImages = [
-      '開場白02.png', 'Line回覆更.png', '生活公約.png', '我已閱讀按鈕.png',
+      '開場白02.png', 'Line回覆更.png', '生活公約03.png', '我已閱讀按鈕.png',
       'day3.png', '團康甩手功.png', 'day04.png', '強制參加團康活動.png',
       '交友圈.png', '苦惱的我.png', '室友很煩.png', '想喝酒.png', '社工抓包.png', '職涯課.png',
       '找工作.png', '社工推薦打掃工作.png', '給社工管錢.png', '沒錢了.png', '戒菸酒.png', '買飲料.png',
@@ -218,12 +218,12 @@
     ];
 
     const allVideos = [
-      'Line對話01.mp4', 'Line對話02.mp4' // 所有影片檔名
+      'Line對話01.mp4', 'Line對話影片002.mp4' // 所有影片檔名
     ];
 
     const imageSteps = [
       'Line回覆更.png',
-      '生活公約.png',
+      '生活公約03.png',
       '計點規則1.png',
       '計點規則2.png',
       '計點規則3.png',
@@ -233,7 +233,7 @@
     ];
 
     const videoAfterImage = {
-      'Line回覆更.png': 'Line對話02.mp4'
+      'Line回覆更.png': 'Line對話影片002.mp4'
     };
 
     let currentImageStep = 0;
@@ -348,7 +348,7 @@
             // 設定背景圖片，在圖片載入完成後顯示文字和按鈕
             setBackground(currentImageFilename, () => {
                 const customButtons = {
-                    '生活公約.png': '我已閱讀按鈕.png',
+                    '生活公約03.png': '我已閱讀按鈕.png',
                     'Line回覆更.png': 'Line按鈕.png',
                 };
                 // 設定按鈕的 src，保留 "點擊螢幕前往下一步.png" 作為預設
@@ -416,7 +416,7 @@ imageStepBtn.addEventListener("click", () => {
 function showNextImageStepContinue() {
     const currentImageFilename = imageSteps[currentImageStep];
     const customButtons = {
-        '生活公約.png': '我已閱讀按鈕.png',
+        '生活公約03.png': '我已閱讀按鈕.png',
         'Line回覆更.png': 'Line按鈕.png',
     };
     imageStepBtn.src = customButtons[currentImageFilename] || "點擊螢幕前往下一步.png";
