@@ -167,7 +167,7 @@
       border: none;
       padding: 0;
       display: none;
-      width: 250px; /* Adjusted size for "點擊螢幕前往下一步.png" */
+      width: 250px; /* Adjusted size for "點擊畫面繼續.png" */
       height: auto;
       object-fit: contain;
       cursor: pointer;
@@ -225,7 +225,7 @@
     </video>
 
     <div id="imageStep">
-      <img id="imageStepBtn" src="點擊螢幕前往下一步.png" alt="下一步" />
+      <img id="imageStepBtn" src="點擊畫面繼續.png" alt="下一步" />
     </div>
 
     <div class="end-screen" id="endScreen"></div>
@@ -241,7 +241,7 @@
       '翻包包.png', '租屋.png', '翻包2.png', '超時.png', 'Line按鈕.png',
       '計點規則1.png','計點規則2.png', '計點規則3.png','計點規則4.png',
       '計點規則5.png','計點規則6.png', '戒菸酒.在.png',
-      "點擊螢幕前往下一步.png", // 確保這個圖片也在列表中
+      '點擊畫面繼續.png', // 確保這個圖片也在列表中
       // 新增 Line 對話系列圖片
       'Line對話1.png', 'Line對話2.png', 'Line對話3.png', 'Line對話穿插03.png',
       'Line對話4.png', 'Line對話5.png', 'Line對話6.png', 'Line對話7.png' // 新增 Line對話7.png
@@ -253,22 +253,21 @@
 
     // 定義所有互動圖片的序列
     const interactiveSequence = [
-        { type: 'lineChatSeriesInit', bg: 'Line對話1.png', button: '點擊螢幕前往下一步.png' },
-        { type: 'lineChatSeriesOverlay', overlay: 'Line對話2.png', button: '點擊螢幕前往下一步.png' },
-        { type: 'lineChatSeriesOverlay', overlay: 'Line對話3.png', button: '點擊螢幕前往下一步.png' },
-        { type: 'lineChatSeriesOverlay', overlay: 'Line對話穿插03.png', button: '點擊螢幕前往下一步.png', hideOnNext: true },
-        { type: 'lineChatSeriesOverlay', overlay: 'Line對話4.png', button: '點擊螢幕前往下一步.png' },
-        { type: 'lineChatSeriesOverlay', overlay: 'Line對話5.png', button: '點擊螢幕前往下一步.png' },
+        { type: 'lineChatSeriesInit', bg: 'Line對話1.png', button: '點擊畫面繼續.png' },
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話2.png', button: '點擊畫面繼續.png' },
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話3.png', button: '點擊畫面繼續.png' },
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話穿插03.png', button: '點擊畫面繼續.png', hideOnNext: true },
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話4.png', button: '點擊畫面繼續.png' },
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話5.png', button: '點擊畫面繼續.png' },
         { type: 'lineChatSeriesOverlay', overlay: 'Line對話6.png', button: 'Line按鈕.png' },
-        { type: 'lineChatSeriesOverlay', overlay: 'Line對話7.png', button: '點擊螢幕前往下一步.png', clearOnNext: true }, // 新增 Line對話7.png 並在點擊後清空所有疊加圖片
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話7.png', button: '點擊畫面繼續.png', clearOnNext: true }, // 新增 Line對話7.png 並在點擊後清空所有疊加圖片
         { type: 'video', src: 'Line對話影片03.mp4' },
         { type: 'static', bg: '生活公約03.png', button: '我已閱讀按鈕.png' },
-        { type: 'static', bg: '計點規則1.png', button: '點擊螢幕前往下一步.png' },
-        { type: 'static', bg: '計點規則2.png', button: '點擊螢幕前往下一步.png' },
-        { type: 'static', bg: '計點規則3.png', button: '點擊螢幕前往下一步.png' },
-        { type: 'static', bg: '計點規則4.png', button: '點擊螢幕前往下一步.png' },
-        { type: 'static', bg: '計點規則5.png', button: '點擊螢幕前往下一步.png' },
-        { type: 'static', bg: '計點規則6.png', button: '點擊螢幕前往下一步.png' }
+        { type: 'static', bg: '計點規則1.png', button: '點擊畫面繼續.png' },
+        { type: 'static', bg: '計點規則2.png', button: '點擊畫面繼續.png' },
+        { type: 'static', bg: '計點規則4.png', button: '點擊畫面繼續.png' },
+        { type: 'static', bg: '計點規則5.png', button: '點擊畫面繼續.png' },
+        { type: 'static', bg: '計點規則6.png', button: '點擊畫面繼續.png' }
     ];
 
     let currentInteractiveStep = 0; // 當前互動步驟的索引
@@ -393,7 +392,7 @@
                 setBackground(step.bg, () => {
                     interactiveImageContainer.style.display = 'block'; // 顯示疊加容器
                     imageStep.style.display = 'flex'; // 顯示按鈕容器
-                    imageStepBtn.src = step.button || "點擊螢幕前往下一步.png";
+                    imageStepBtn.src = step.button || "點擊畫面繼續.png";
                     imageStepBtn.classList.remove('line-button');
                     imageStepBtn.style.display = 'block'; // 顯示按鈕圖片
                 });
@@ -408,7 +407,7 @@
                 interactiveImageContainer.style.display = 'block';
 
                 imageStep.style.display = 'flex';
-                imageStepBtn.src = step.button || "點擊螢幕前往下一步.png";
+                imageStepBtn.src = step.button || "點擊畫面繼續.png";
                 imageStepBtn.classList.remove('line-button');
                 if (step.button === 'Line按鈕.png') {
                     imageStepBtn.classList.add('line-button');
@@ -419,7 +418,7 @@
                 interactiveImageContainer.style.display = 'none';
                 setBackground(step.bg, () => {
                     imageStep.style.display = 'flex';
-                    imageStepBtn.src = step.button || "點擊螢幕前往下一步.png";
+                    imageStepBtn.src = step.button || "點擊畫面繼續.png";
                     imageStepBtn.classList.remove('line-button');
                     imageStepBtn.style.display = 'block';
                 });
