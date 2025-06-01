@@ -232,6 +232,8 @@
     <div id="clickOverlay"></div>
   </div>
 
+  <audio id="backgroundMusic" src="BGM.mp3" loop preload="auto"></audio>
+
   <script>
     const allImages = [
       '開場白02.png', 'Line回覆更.png', '生活公約03.png', '我已閱讀按鈕.png',
@@ -249,6 +251,11 @@
 
     const allVideos = [
     'Line對話影片03.mp4'
+    ];
+
+    // 新增背景音樂檔案到預載列表
+    const allAudio = [
+      'BGM.mp3'
     ];
 
     // 定義所有互動圖片的序列
@@ -284,6 +291,7 @@
     const clickOverlay = document.getElementById('clickOverlay');
     const backgroundImageElement = document.getElementById('background-image-element');
     const interactiveImageContainer = document.getElementById('interactive-image-container');
+    const backgroundMusic = document.getElementById('backgroundMusic'); // 獲取音樂元素
 
     // --- 輔助函數：切換背景圖片 ---
     function setBackground(imageSrc, callback = () => {}) {
@@ -305,10 +313,10 @@
         }
     }
 
-    // --- 預載所有圖片和影片的函數 ---
-    function preloadAllAssets(images, videos, callback) {
+    // --- 預載所有圖片、影片和音頻的函數 ---
+    function preloadAllAssets(images, videos, audio, callback) {
         let loadedCount = 0;
-        const totalAssets = images.length + videos.length;
+        const totalAssets = images.length + videos.length + audio.length;
 
         if (totalAssets === 0) {
             callback();
@@ -334,27 +342,47 @@
         videos.forEach(vidSrc => {
             const vid = document.createElement('video');
             vid.src = vidSrc;
-            vid.onloadeddata = updateLoadingProgress;
+            // 使用 oncanplaythrough 更可靠，表示影片可以完整播放而不會中斷
+            vid.oncanplaythrough = updateLoadingProgress;
             vid.onerror = updateLoadingProgress;
             vid.load();
+        });
+
+        audio.forEach(audioSrc => {
+            const aud = new Audio(); // 使用 Audio 物件
+            aud.src = audioSrc;
+            // 使用 oncanplaythrough 更可靠，表示音頻可以完整播放而不會中斷
+            aud.oncanplaythrough = updateLoadingProgress;
+            aud.onerror = updateLoadingProgress;
+            aud.load();
         });
     }
 
     // --- 遊戲初始化與預載 ---
     window.addEventListener('load', () => {
-        preloadAllAssets(allImages, allVideos, () => {
+        preloadAllAssets(allImages, allVideos, allAudio, () => {
             loadingScreen.style.opacity = 0;
             loadingScreen.addEventListener('transitionend', () => {
                 loadingScreen.style.display = 'none';
                 startScreen.style.display = 'block';
+                // 這裡不再嘗試自動播放音樂，因為瀏覽器會阻止
             }, { once: true });
         });
     });
 
-    // --- 開場畫面點擊事件 ---
+    // --- 開場畫面點擊事件 (現在也用來確保音樂播放) ---
     startScreen.addEventListener("click", () => {
         startScreen.style.display = "none";
-        showNextInteractiveStep(); // 直接進入互動序列
+        
+        // **核心改動點：嘗試播放音樂，並在成功後才推進劇情**
+        backgroundMusic.play().then(() => {
+            console.log("背景音樂成功播放！");
+            showNextInteractiveStep(); // 音樂播放成功後，才進入下一個互動步驟
+        }).catch(error => {
+            console.warn("背景音樂自動播放失敗，可能需要用戶互動，但遊戲仍會繼續:", error);
+            // 即使音樂播放失敗 (例如用戶禁用聲音)，遊戲劇情也應該繼續
+            showNextInteractiveStep();
+        });
     });
 
     // --- 顯示下一個互動步驟 ---
@@ -485,7 +513,7 @@
       },
       ddd: {
         bg: '強制參加團康活動.png',
-        speech: '生活輔導員擋在活動室門口，年紀看起來比你還小，卻語氣強硬：「規定就是規定，每個人都要參加團康活動。」他語調平淡卻不容質疑，手指向裡頭擺動，像是在催促你趕快進去。生輔員用這種態度對你頤指氣使，你心裡一陣不舒服⋯⋯',
+        speech: '生活輔導員擋在活動室門口，年紀看起來比你還小，卻語氣強硬：「規定就是規定，每個人都要參加團康活動。」他語調平淡卻不容置疑，手指向裡頭擺動，像是在催促你趕快進去。生輔員用這種態度對你頤指氣使，你心裡一陣不舒服⋯⋯',
         choices: [
           { text: '壓下情緒，走進活動室', next: 'b2' },
           { text: '被他那語氣惹毛，懶得理會', next: 'ggg' }
