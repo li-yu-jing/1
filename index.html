@@ -20,36 +20,30 @@
       position: relative;
       background-color: black;
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
-      overflow: auto;
+      overflow: hidden; /* Prevent content from spilling out */
     }
 
-    /* 新增的背景圖片元素樣式 */
     #background-image-element {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        object-fit: cover; /* 確保圖片覆蓋整個容器 */
-        opacity: 1; /* 預設完全不透明 */
-        /* REMOVED: transition: opacity 0.7s ease-in-out; */ /* 移除淡入淡出效果 */
-        z-index: 1; /* 確保在最底層 */
-    }
-    /* The .active class is no longer needed for opacity transition but can be kept if other active states are planned */
-    /* #background-image-element.active {
+        object-fit: cover;
         opacity: 1;
-    } */
+        z-index: 1;
+    }
 
-    /* 所有遊戲內容（對話框、按鈕、影片）都在背景圖片之上 */
+    /* 所有遊戲內容（對話框、按鈕、影片、疊加圖片）都在背景圖片之上 */
     .content,
     .speech-bubble,
     .start-screen,
     #introVideo,
-    #imageStep,
+    #interactive-image-container, /* 新增的互動圖片容器 */
     #imageStepBtn,
     .end-screen,
     #clickOverlay {
-      position: absolute; /* 確保 z-index 生效 */
+      position: absolute;
       z-index: 2; /* 比背景圖片高 */
     }
 
@@ -60,8 +54,30 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: none; /* 預設隱藏 */
-      z-index: 3; /* 比其他互動元素略高，確保影片層次正確 */
+      display: none;
+      z-index: 3;
+    }
+
+    /* 新增的互動圖片容器樣式 */
+    #interactive-image-container {
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none; /* 預設隱藏 */
+        z-index: 2; /* 在背景圖片之上 */
+        pointer-events: none; /* 讓點擊穿透到下面的按鈕 */
+    }
+
+    /* 疊加的 Line 對話圖片樣式 */
+    .overlay-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* 保持圖片比例 */
+        display: block; /* 預設為 block，因為是動態添加，添加後就該顯示 */
     }
 
     /* 其他既有樣式 (保留不變) */
@@ -69,7 +85,7 @@
       bottom: 18px;
       width: 100%;
       text-align: center;
-      display: none; /* 預設隱藏 */
+      display: none;
     }
     .btn {
       margin: 10px;
@@ -95,10 +111,9 @@
       border-radius: 10px;
       font-weight: bold;
       font-size: 16px;
-      display: none; /* 預設隱藏 */
+      display: none;
     }
     .start-screen {
-      /* 開場白02.png 仍然使用 background-image */
       background-image: url('開場白02.png');
       background-size: cover;
       background-position: center;
@@ -132,29 +147,40 @@
       bottom: 0;
       cursor: pointer;
     }
+    /* imageStep now is just a container for the button */
     #imageStep {
-      display: none;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+        position: absolute;
+        bottom: 0; /* Align to bottom */
+        left: 0;
+        width: 100%;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end; /* Align button to bottom */
+        display: none;
+        z-index: 4; /* 確保按鈕在疊加圖片之上 */
     }
     #imageStepBtn {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
+      /* Positioned within #imageStep which is flex-centered */
       background-color: transparent !important;
       color: white;
-      border: none; /* 確保按鈕沒有邊框 */
-      padding: 0; /* 移除內邊距 */
-      display: none; /* 預設隱藏 */
+      border: none;
+      padding: 0;
+      display: none;
+      width: 250px; /* Adjusted size for "點擊螢幕前往下一步.png" */
+      height: auto;
+      object-fit: contain;
+      cursor: pointer;
+      margin-bottom: 50px; /* Space from bottom */
     }
     .line-button {
-      width: 300px; /* 根據 Line按鈕.png 的寬度設定 */
+      width: 180px; /* Adjust size for Line按鈕.png */
+      height: auto;
       transition: transform 0.3s ease;
       cursor: pointer;
     }
     .line-button:hover {
-      transform: translateX(-50%) scale(1.2);
+      transform: scale(1.05);
     }
     /* 載入畫面 */
     #loadingScreen {
@@ -171,7 +197,7 @@
       font-size: 24px;
       z-index: 9999;
       opacity: 1;
-      transition: opacity 1s ease-out; /* 載入畫面淡出效果 */
+      transition: opacity 1s ease-out;
     }
   </style>
 </head>
@@ -180,6 +206,9 @@
 
   <div class="game-container" id="mainGameContainer">
     <img id="background-image-element" src="" alt="背景圖片">
+
+    <div id="interactive-image-container">
+        </div>
 
     <div class="speech-bubble" id="speech"></div>
     <div class="content" id="choices"></div>
@@ -196,7 +225,7 @@
     </video>
 
     <div id="imageStep">
-      <img id="imageStepBtn" class="line-button" src="Line按鈕.png" alt="下一步" />
+      <img id="imageStepBtn" src="點擊螢幕前往下一步.png" alt="下一步" />
     </div>
 
     <div class="end-screen" id="endScreen"></div>
@@ -209,64 +238,67 @@
       'day3.png', '團康甩手功.png', 'day04.png', '強制參加團康活動.png',
       '交友圈.png', '苦惱的我.png', '室友很煩.png', '想喝酒.png', '社工抓包.png', '職涯課.png',
       '找工作.png', '社工推薦打掃工作.png', '給社工管錢.png', '沒錢了.png', '戒菸酒.png', '買飲料.png',
-      '翻包包.png', '租屋.png', '翻包2.png', '超時.png', 'Line按鈕.png','計點規則1.png','計點規則2.png',
-      '計點規則3.png','計點規則4.png','計點規則5.png',
-      '計點規則6.png',
-      '戒菸酒.在.png' ,
-      "點擊螢幕前往下一步.png"// 確保這個圖片也在列表中
+      '翻包包.png', '租屋.png', '翻包2.png', '超時.png', 'Line按鈕.png',
+      '計點規則1.png','計點規則2.png', '計點規則3.png','計點規則4.png',
+      '計點規則5.png','計點規則6.png', '戒菸酒.在.png',
+      "點擊螢幕前往下一步.png", // 確保這個圖片也在列表中
+      // 新增 Line 對話系列圖片
+      'Line對話1.png', 'Line對話2.png', 'Line對話3.png', 'Line對話穿插03.png',
+      'Line對話4.png', 'Line對話5.png', 'Line對話6.png', 'Line對話7.png' // 新增 Line對話7.png
     ];
 
     const allVideos = [
-      'Line對話01.mp4', 'Line對話影片002.mp4' // 所有影片檔名
+      'Line對話01.mp4', 'Line對話影片03.mp4'
     ];
 
-    const imageSteps = [
-      'Line回覆更.png',
-      '生活公約03.png',
-      '計點規則1.png',
-      '計點規則2.png',
-      '計點規則3.png',
-      '計點規則4.png',
-      '計點規則5.png',
-      '計點規則6.png'
+    // 定義所有互動圖片的序列
+    const interactiveSequence = [
+        { type: 'lineChatSeriesInit', bg: 'Line對話1.png', button: '點擊螢幕前往下一步.png' },
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話2.png', button: '點擊螢幕前往下一步.png' },
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話3.png', button: '點擊螢幕前往下一步.png' },
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話穿插03.png', button: '點擊螢幕前往下一步.png', hideOnNext: true },
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話4.png', button: '點擊螢幕前往下一步.png' },
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話5.png', button: '點擊螢幕前往下一步.png' },
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話6.png', button: 'Line按鈕.png' },
+        { type: 'lineChatSeriesOverlay', overlay: 'Line對話7.png', button: '點擊螢幕前往下一步.png', clearOnNext: true }, // 新增 Line對話7.png 並在點擊後清空所有疊加圖片
+        { type: 'video', src: 'Line對話影片03.mp4' },
+        { type: 'static', bg: '生活公約03.png', button: '我已閱讀按鈕.png' },
+        { type: 'static', bg: '計點規則1.png', button: '點擊螢幕前往下一步.png' },
+        { type: 'static', bg: '計點規則2.png', button: '點擊螢幕前往下一步.png' },
+        { type: 'static', bg: '計點規則3.png', button: '點擊螢幕前往下一步.png' },
+        { type: 'static', bg: '計點規則4.png', button: '點擊螢幕前往下一步.png' },
+        { type: 'static', bg: '計點規則5.png', button: '點擊螢幕前往下一步.png' },
+        { type: 'static', bg: '計點規則6.png', button: '點擊螢幕前往下一步.png' }
     ];
 
-    const videoAfterImage = {
-      'Line回覆更.png': 'Line對話影片002.mp4'
-    };
-
-    let currentImageStep = 0;
+    let currentInteractiveStep = 0; // 當前互動步驟的索引
 
     // 獲取 DOM 元素
     const startScreen = document.getElementById('startScreen');
-    const introVideo = document.getElementById('introVideo'); // 影片元素
-    const imageStep = document.getElementById('imageStep'); // 圖片步驟容器
-    const imageStepBtn = document.getElementById('imageStepBtn'); // 圖片步驟的按鈕
-    const mainGameContainer = document.getElementById('mainGameContainer'); // 遊戲主容器
-    const speech = document.getElementById('speech'); // 對話框元素
-    const choices = document.getElementById('choices'); // 選擇按鈕容器元素
+    const introVideo = document.getElementById('introVideo');
+    const imageStep = document.getElementById('imageStep');
+    const imageStepBtn = document.getElementById('imageStepBtn');
+    const mainGameContainer = document.getElementById('mainGameContainer');
+    const speech = document.getElementById('speech');
+    const choices = document.getElementById('choices');
     const loadingScreen = document.getElementById('loadingScreen');
     const clickOverlay = document.getElementById('clickOverlay');
-    const backgroundImageElement = document.getElementById('background-image-element'); // 新增的背景圖片元素
+    const backgroundImageElement = document.getElementById('background-image-element');
+    const interactiveImageContainer = document.getElementById('interactive-image-container');
 
-    // --- 輔助函數：切換背景圖片（移除淡入淡出）---
+    // --- 輔助函數：切換背景圖片 ---
     function setBackground(imageSrc, callback = () => {}) {
-        // 確保影片是隱藏的，以免與圖片重疊
         introVideo.style.display = 'none';
-
-        // 直接設定 src，因為沒有淡出動畫
         backgroundImageElement.src = imageSrc;
-        // 確保圖片顯示
-        // backgroundImageElement.classList.add('active'); // No longer needed if opacity is always 1
+        backgroundImageElement.style.display = 'block';
 
-        // 確保圖片載入完成後再執行回調
         const onImageLoaded = () => {
             backgroundImageElement.removeEventListener('load', onImageLoaded);
             backgroundImageElement.removeEventListener('error', onImageLoaded);
-            callback(); // 圖片載入完成後執行回調
+            callback();
         };
 
-        if (backgroundImageElement.complete) { // 如果圖片已經載入過
+        if (backgroundImageElement.complete) {
             onImageLoaded();
         } else {
             backgroundImageElement.onload = onImageLoaded;
@@ -303,9 +335,9 @@
         videos.forEach(vidSrc => {
             const vid = document.createElement('video');
             vid.src = vidSrc;
-            vid.onloadeddata = updateLoadingProgress; // 影片數據載入完成
+            vid.onloadeddata = updateLoadingProgress;
             vid.onerror = updateLoadingProgress;
-            vid.load(); // 開始載入影片
+            vid.load();
         });
     }
 
@@ -320,129 +352,106 @@
         });
     });
 
-    // --- 開場畫面點擊事件 (保留原有邏輯) ---
+    // --- 開場畫面點擊事件 ---
     startScreen.addEventListener("click", () => {
-        startScreen.style.display = "none"; // 隱藏開場畫面
-        // backgroundImageElement.classList.remove('active'); // No longer needed if opacity is always 1
-
-        introVideo.src = "Line對話01.mp4"; // 影片檔名保留
-        introVideo.style.display = "block"; // 顯示影片
-        introVideo.play();
-
-        introVideo.onended = () => {
-            introVideo.style.display = "none"; // 影片播放結束後隱藏影片
-            showNextImageStep(); // 進入圖片步驟
-        };
+        startScreen.style.display = "none";
+        showNextInteractiveStep(); // 直接進入互動序列
     });
 
-    // --- 顯示下一個圖片步驟 (修正同步顯示和按鈕) ---
-    function showNextImageStep() {
-        if (currentImageStep < imageSteps.length) {
-            const currentImageFilename = imageSteps[currentImageStep];
+    // --- 顯示下一個互動步驟 ---
+    function showNextInteractiveStep() {
+        // 隱藏所有互動元素，為下一個步驟做準備
+        speech.style.display = 'none';
+        choices.style.display = 'none';
+        imageStepBtn.style.display = 'none';
+        imageStep.style.display = 'none';
+        introVideo.style.display = 'none';
+        
+        // 檢查是否還有下一個步驟
+        if (currentInteractiveStep < interactiveSequence.length) {
+            const step = interactiveSequence[currentInteractiveStep];
 
-            // 確保對話框和按鈕在圖片顯示前隱藏
-            speech.style.display = 'none';
-            imageStepBtn.style.display = 'none';
+            // 處理上一個步驟的隱藏邏輯 (如果上一步有 hideOnNext: true 或 clearOnNext: true)
+            if (currentInteractiveStep > 0) {
+                const prevStep = interactiveSequence[currentInteractiveStep - 1];
+                if ((prevStep.type === 'lineChatSeriesOverlay' && prevStep.hideOnNext)) {
+                    // 隱藏 interactiveImageContainer 中的最後一個子元素 (即上一步添加的圖片)
+                    if (interactiveImageContainer.lastElementChild) {
+                        interactiveImageContainer.lastElementChild.style.display = 'none';
+                    }
+                }
+                if (prevStep.type === 'lineChatSeriesOverlay' && prevStep.clearOnNext) {
+                    interactiveImageContainer.innerHTML = ''; // 清空所有疊加圖片
+                    interactiveImageContainer.style.display = 'none'; // 隱藏互動圖片容器
+                    backgroundImageElement.style.display = 'none'; // 隱藏 Line對話1.png 背景
+                }
+            }
 
-            // 設定背景圖片，在圖片載入完成後顯示文字和按鈕
-            setBackground(currentImageFilename, () => {
-                const customButtons = {
-                    '生活公約03.png': '我已閱讀按鈕.png',
-                    'Line回覆更.png': 'Line按鈕.png',
+
+            if (step.type === 'lineChatSeriesInit') {
+                interactiveImageContainer.innerHTML = ''; // 清空疊加圖片 (如果之前有其他圖片殘留)
+                setBackground(step.bg, () => {
+                    interactiveImageContainer.style.display = 'block'; // 顯示疊加容器
+                    imageStep.style.display = 'flex'; // 顯示按鈕容器
+                    imageStepBtn.src = step.button || "點擊螢幕前往下一步.png";
+                    imageStepBtn.classList.remove('line-button');
+                    imageStepBtn.style.display = 'block'; // 顯示按鈕圖片
+                });
+            } else if (step.type === 'lineChatSeriesOverlay') {
+                const overlayImg = document.createElement('img');
+                overlayImg.src = step.overlay;
+                overlayImg.classList.add('overlay-image');
+                interactiveImageContainer.appendChild(overlayImg);
+
+                // 確保背景圖片顯示（對於疊加系列，背景圖片是 Line對話1.png）
+                backgroundImageElement.style.display = 'block';
+                interactiveImageContainer.style.display = 'block';
+
+                imageStep.style.display = 'flex';
+                imageStepBtn.src = step.button || "點擊螢幕前往下一步.png";
+                imageStepBtn.classList.remove('line-button');
+                if (step.button === 'Line按鈕.png') {
+                    imageStepBtn.classList.add('line-button');
+                }
+                imageStepBtn.style.display = 'block';
+            } else if (step.type === 'static') {
+                interactiveImageContainer.innerHTML = '';
+                interactiveImageContainer.style.display = 'none';
+                setBackground(step.bg, () => {
+                    imageStep.style.display = 'flex';
+                    imageStepBtn.src = step.button || "點擊螢幕前往下一步.png";
+                    imageStepBtn.classList.remove('line-button');
+                    imageStepBtn.style.display = 'block';
+                });
+            } else if (step.type === 'video') {
+                backgroundImageElement.style.display = 'none';
+                interactiveImageContainer.innerHTML = '';
+                interactiveImageContainer.style.display = 'none';
+
+                introVideo.src = step.src;
+                introVideo.style.display = 'block';
+                introVideo.play();
+
+                introVideo.onended = () => {
+                    currentInteractiveStep++;
+                    showNextInteractiveStep();
                 };
-                // 設定按鈕的 src，保留 "點擊螢幕前往下一步.png" 作為預設
-                imageStepBtn.src = customButtons[currentImageFilename] || "點擊螢幕前往下一步.png";
-                imageStepBtn.style.display = "block"; // 顯示按鈕
-                imageStep.style.display = "block"; // 顯示圖片步驟容器（雖然現在只包含按鈕）
-
-            });
+                return; // 影片播放結束後會自動推進，所以這裡直接返回
+            }
         } else {
-            imageStep.style.display = "none"; // 隱藏圖片步驟容器
-            speech.style.display = "none"; // 隱藏對話框
-            imageStepBtn.style.display = "none"; // 隱藏按鈕
-            startScene(); // 進入主遊戲場景
+            // 所有互動序列播放完畢，進入遊戲主場景
+            backgroundImageElement.style.display = 'none';
+            interactiveImageContainer.style.display = 'none';
+            startScene();
+            return;
         }
     }
 
-    // --- 圖片步驟按鈕點擊事件 ---
-// --- 圖片步驟按鈕點擊事件 ---
-imageStepBtn.addEventListener("click", () => {
-    speech.style.display = 'none'; // 隱藏對話框
-    imageStepBtn.style.display = "none"; // 隱藏按鈕
-    imageStep.style.display = "none"; // 隱藏圖片步驟容器 (如果它有其他視覺作用)
-
-    const currentImageFilename = imageSteps[currentImageStep];
-
-    if (videoAfterImage[currentImageFilename]) {
-        // 在播放影片之前，先將背景圖片元素隱藏
-        backgroundImageElement.style.display = 'none'; // 新增這行
-
-        introVideo.src = videoAfterImage[currentImageFilename]; // 影片檔名
-        introVideo.style.display = "block"; // 顯示影片
-        introVideo.play();
-
-        introVideo.onended = () => {
-            introVideo.style.display = "none"; // 影片播放結束後隱藏影片
-
-            currentImageStep++; // 進到下一個圖片步驟
-            const nextImageFilename = imageSteps[currentImageStep];
-
-            if (nextImageFilename) { // 確保還有下一個圖片步驟
-                // 設定下一個背景圖片，並在載入完成後顯示背景圖片元素
-                setBackground(nextImageFilename, () => {
-                    backgroundImageElement.style.display = 'block'; // 新增這行：圖片載入完成後顯示背景圖片元素
-                    // 這裡才是正確的呼叫位置！
-                    showNextImageStepContinue(); // <-- **直接呼叫這個函數**
-                });
-            } else {
-                // 如果沒有下一個圖片，直接隱藏所有相關元素並進入主遊戲
-                introVideo.style.display = "none";
-                backgroundImageElement.style.display = 'none'; // 如果是最後一步，確保背景圖片也隱藏
-                imageStep.style.display = "none";
-                speech.style.display = "none";
-                imageStepBtn.style.display = "none";
-                startScene(); // 進入主遊戲場景
-            }
-        };
-    } else {
-        currentImageStep++;
-        showNextImageStep(); // 如果沒有影片，直接顯示下一個圖片步驟
-    }
-});
-
-// 新增一個輔助函數來處理 showNextImageStep 的後續邏輯
-// 這個函數的定義應該在外面，不要被嵌套在其他函數內部
-function showNextImageStepContinue() {
-    const currentImageFilename = imageSteps[currentImageStep];
-    const customButtons = {
-        '生活公約03.png': '我已閱讀按鈕.png',
-        'Line回覆更.png': 'Line按鈕.png',
-    };
-    imageStepBtn.src = customButtons[currentImageFilename] || "點擊螢幕前往下一步.png";
-    imageStepBtn.style.display = "block"; // 顯示按鈕
-    imageStep.style.display = "block"; // 確保圖片步驟容器也顯示
-}
-
-// 請確保 setBackground 函數是這樣：
-// --- 輔助函數：切換背景圖片（移除淡入淡出）---
-function setBackground(imageSrc, callback = () => {}) {
-    introVideo.style.display = 'none'; // 確保影片是隱藏的，以免與圖片重疊
-    // backgroundImageElement.style.display = 'block'; // 這裡不需要設置 display，在調用處控制
-
-    backgroundImageElement.src = imageSrc;
-    const onImageLoaded = () => {
-        backgroundImageElement.removeEventListener('load', onImageLoaded);
-        backgroundImageElement.removeEventListener('error', onImageLoaded);
-        callback(); // 圖片載入完成後執行回調
-    };
-
-    if (backgroundImageElement.complete) {
-        onImageLoaded();
-    } else {
-        backgroundImageElement.onload = onImageLoaded;
-        backgroundImageElement.onerror = onImageLoaded;
-    }
-}
+    // --- 圖片步驟按鈕點擊事件 (現在用於推進互動序列) ---
+    imageStepBtn.addEventListener("click", () => {
+        currentInteractiveStep++;
+        showNextInteractiveStep();
+    });
 
     // --- 進入主遊戲場景的開頭 (保留原有邏輯) ---
     function startScene() {
@@ -451,7 +460,7 @@ function setBackground(imageSrc, callback = () => {}) {
 
     // --- 場景資料 (完全保留不變) ---
     const scenes = {
- accept: {
+      accept: {
         bg: 'day3.png',
         speech: '當你第一次踏進安置機構，印入眼簾的這棟雙層樓的老屋，鐵皮屋頂鏽蝕、牆面斑駁，但中庭寬闊，四周圍繞著寢室。房內擺滿雙層床，金屬床架沿牆排開，有些還空著，有些則堆滿個人物品、塑膠袋、衣服與掛在梯子上的外套，空間顯得擁擠而充滿生活感。這裡或許稱不上舒適，但至少給了你一張床、一個棲身之所。對你來說，一切還很陌生，還不太知道該怎麼開始新的生活。',
         choices: [
@@ -655,6 +664,7 @@ function setBackground(imageSrc, callback = () => {}) {
           { text: '覺得受不了制度管束 ，選擇離開機構回到街頭', next: 'a9' }
         ]
       },
+
       }
 
     // --- 核心函數：切換遊戲場景顯示 ---
@@ -669,6 +679,8 @@ function setBackground(imageSrc, callback = () => {}) {
         imageStep.style.display = 'none'; // 隱藏圖片步驟容器
         imageStepBtn.style.display = 'none'; // 隱藏圖片步驟按鈕
         introVideo.style.display = 'none'; // 確保影片隱藏
+        interactiveImageContainer.style.display = 'none'; // 確保互動容器隱藏
+        interactiveImageContainer.innerHTML = ''; // 清空疊加圖片
 
         // 設定新的背景圖片，並在圖片載入完成後顯示文字和按鈕
         setBackground(scene.bg, () => {
