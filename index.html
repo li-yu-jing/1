@@ -233,8 +233,7 @@
   </div>
 
   <audio id="backgroundMusic" src="BGM.mp3" loop preload="auto"></audio>
-
-  <script>
+  <audio id="buttonSound" src="按鈕音效.mp3" preload="auto"></audio> <script>
     const allImages = [
       '開場白02.png', 'Line回覆更.png', '生活公約03.png', '我已閱讀按鈕.png',
       'day3.png', '團康甩手功.png', 'day04.png', '強制參加團康活動.png',
@@ -255,7 +254,8 @@
 
     // 新增背景音樂檔案到預載列表
     const allAudio = [
-      'BGM.mp3'
+      'BGM.mp3',
+      '按鈕音效.mp3' // 新增按鈕音效到預載列表
     ];
 
     // 定義所有互動圖片的序列
@@ -291,7 +291,16 @@
     const clickOverlay = document.getElementById('clickOverlay');
     const backgroundImageElement = document.getElementById('background-image-element');
     const interactiveImageContainer = document.getElementById('interactive-image-container');
-    const backgroundMusic = document.getElementById('backgroundMusic'); // 獲取音樂元素
+    const backgroundMusic = document.getElementById('backgroundMusic'); // 獲取背景音樂元素
+    const buttonSound = document.getElementById('buttonSound'); // 獲取按鈕音效元素
+
+    // --- 輔助函數：播放按鈕音效 ---
+    function playButtonSound() {
+        if (buttonSound) {
+            buttonSound.currentTime = 0; // 從頭開始播放，避免聲音重疊
+            buttonSound.play().catch(e => console.warn("按鈕音效播放失敗:", e));
+        }
+    }
 
     // --- 輔助函數：切換背景圖片 ---
     function setBackground(imageSrc, callback = () => {}) {
@@ -373,15 +382,14 @@
     // --- 開場畫面點擊事件 (現在也用來確保音樂播放) ---
     startScreen.addEventListener("click", () => {
         startScreen.style.display = "none";
+        // 點擊開始畫面不再播放音效，但會嘗試播放背景音樂
         
-        // **核心改動點：嘗試播放音樂，並在成功後才推進劇情**
         backgroundMusic.play().then(() => {
             console.log("背景音樂成功播放！");
             showNextInteractiveStep(); // 音樂播放成功後，才進入下一個互動步驟
         }).catch(error => {
             console.warn("背景音樂自動播放失敗，可能需要用戶互動，但遊戲仍會繼續:", error);
-            // 即使音樂播放失敗 (例如用戶禁用聲音)，遊戲劇情也應該繼續
-            showNextInteractiveStep();
+            showNextInteractiveStep(); // 即使音樂播放失敗，遊戲劇情也應該繼續
         });
     });
 
@@ -407,10 +415,12 @@
                         interactiveImageContainer.lastElementChild.style.display = 'none';
                     }
                 }
+                // ***修正：將 clearOnNext 的處理放在 showNextInteractiveStep 的開頭***
+                // 這樣確保在下一個步驟開始前，畫面能正確清空
                 if (prevStep.type === 'lineChatSeriesOverlay' && prevStep.clearOnNext) {
                     interactiveImageContainer.innerHTML = ''; // 清空所有疊加圖片
                     interactiveImageContainer.style.display = 'none'; // 隱藏互動圖片容器
-                    backgroundImageElement.style.display = 'none'; // 隱藏 Line對話1.png 背景
+                    // backgroundImageElement.style.display = 'none'; // 這裡不再隱藏背景，因為下一個步驟會設置新背景
                 }
             }
 
@@ -466,9 +476,11 @@
                 return; // 影片播放結束後會自動推進，所以這裡直接返回
             }
         } else {
-            // 所有互動序列播放完畢，進入遊戲主場景
-            backgroundImageElement.style.display = 'none';
-            interactiveImageContainer.style.display = 'none';
+            // 所有互動序列播放完畢，正確進入遊戲主場景
+            console.log("Interactive sequence finished, transitioning to startScene.");
+            backgroundImageElement.style.display = 'none'; // 確保背景圖片隱藏
+            interactiveImageContainer.style.display = 'none'; // 確保互動容器隱藏
+            interactiveImageContainer.innerHTML = ''; // 清空所有疊加圖片
             startScene();
             return;
         }
@@ -476,6 +488,7 @@
 
     // --- 圖片步驟按鈕點擊事件 (現在用於推進互動序列) ---
     imageStepBtn.addEventListener("click", () => {
+        playButtonSound(); // 點擊圖片步驟按鈕時播放音效
         currentInteractiveStep++;
         showNextInteractiveStep();
     });
@@ -715,8 +728,9 @@
             speech.style.display = 'block'; // 顯示對話框
 
             if (scene.choices.length > 0) {
+                // 為每個選項按鈕綁定點擊事件，並在點擊時播放音效
                 choices.innerHTML = scene.choices.map(choice =>
-                  `<button class="btn" onclick="goTo('${choice.next}')">${choice.text}</button>`
+                  `<button class="btn" onclick="playButtonSound(); goTo('${choice.next}')">${choice.text}</button>`
                 ).join('');
                 choices.style.display = 'block'; // 顯示選項按鈕
             } else if (scene.autoNext) {
@@ -725,6 +739,7 @@
                 choices.style.display = 'block';
                 clickOverlay.style.display = 'block';
                 clickOverlay.onclick = () => {
+                    playButtonSound(); // 點擊疊加層繼續時播放音效
                     goTo(scene.autoNext);
                 };
             } else {
