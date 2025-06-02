@@ -145,8 +145,11 @@
       left: 0;
       right: 0;
       bottom: 0;
+      position: absolute;
+      z-index: 999;         /* 保證在最上層 */
       cursor: pointer;
-    }
+      pointer-events: auto; /* 這是關鍵！讓它可以點擊 */
+}
     /* imageStep now is just a container for the button */
     #imageStep {
         position: absolute;
