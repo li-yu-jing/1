@@ -478,36 +478,55 @@
         choices: []
       },
       d2: {
-        bg: 'day04.png',
-        speech: '我已經習慣了機構的生活節奏，每天早起參加晨會、整理內務、參與課程。雖然規律，但我感到有些束縛。',
+        bg: 'day3.png',
+        speech: '對我來說，一切還很陌生，還不太知道該怎麼開始新的生活。',
         choices: [
-          { text: '接受現狀，繼續適應', next: 'adapt' },
-          { text: '尋找改變的機會', next: 'change' }
+          { text: '決定先觀察一陣子，獨自在房間休息', next: 'bbb' },
+          { text: '趕快嘗試看看能不能適應新生活', next: 'aaa' }
         ]
       },
-      adapt: {
-        bg: 'day04.png',
-        speech: '我選擇接受現狀，慢慢適應這裡的生活。雖然有時會感到壓抑，但至少有個安穩的地方。',
-        autoNext: 'end_adapt',
+      aaa: {
+        bg: '團康甩手功.png',
+        speech: '吃完早餐，社工公布今天的團康活動，全體住民都要參加手工藝課。',
+        autoNext: 'd3',
         choices: []
       },
-      change: {
-        bg: 'day04.png',
-        speech: '我決定尋找改變的機會，積極參與各種課程和活動，希望能早日重新站起來。',
-        autoNext: 'end_change',
+      d3: {
+        bg: '團康甩手功.png',
+        speech: '聽到社工的公告，有些老住民已經習慣的開始動作，我卻還坐在角落。',
+        autoNext: 'd4',
         choices: []
       },
-      end_adapt: {
+      d4: {
+        bg: '團康甩手功.png',
+        speech: '不清楚這些安排對我有沒有幫助，而且我還不太認識這邊的其他住民和生活輔導員⋯⋯',
+        choices: [
+          { text: '不願參加，找理由推託', next: 'ddd' },
+          { text: '勉強參加，但覺得無聊', next: 'ccc' }
+        ]
+      },
+      bbb: {
         bg: 'day04.png',
-        speech: '經過一段時間的適應，我漸漸找到了在機構中的平衡點。雖然自由受限，但我學會了珍惜當下的安穩。',
+        speech: '早上的團體活動時間，住在街頭多年的我早就過慣了沒日沒夜的生活，只想躺著休息。',
+        autoNext: 'd5',
         choices: []
       },
-      end_change: {
+      d5: {
         bg: 'day04.png',
-        speech: '通過積極參與和努力學習，我逐漸獲得了社工的信任，也為自己的未來找到了新的方向。改變雖然不容易，但值得。',
+        speech: '但才剛躺下，生活輔導員就在門口催促我：「起來囉，要去打掃跟做早操了，每天早上都要，大家都得去。」',
+        autoNext: 'd6',
         choices: []
-      }
+      },
+      d6: {
+        bg: 'day04.png',
+        speech: '我知道這是規定，但真的不太習慣這種被安排好的團體生活⋯⋯',
+        choices: [
+          { text: '草草應付參加活動', next: 'ccc' },
+          { text: '拒絕並表現不滿', next: 'ddd' }
+        ]
+      },
     };
+
 
 let currentScene = 'accept';
 
