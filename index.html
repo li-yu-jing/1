@@ -515,6 +515,25 @@
 
 
     };
+
+    let currentScene = 'accept';
+
+function goToScene(sceneName) {
+  currentScene = sceneName;
+  const scene = scenes[sceneName];
+  updateDisplay(scene); // 顯示背景圖與文字
+}
+
+function onClickNext() {
+  const scene = scenes[currentScene];
+
+  if (scene.autoNext) {
+    goToScene(scene.autoNext);
+  } else {
+    // 顯示選項或暫停
+  }
+}
+
 // --- 核心函數：切換遊戲場景顯示 ---
     function goTo(key) {
         const scene = scenes[key];
