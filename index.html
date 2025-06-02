@@ -515,59 +515,33 @@
 
 
     };
-// 初始畫面從某個 key 開始，例如 'd5'
-  let currentStep = "accept";
+let currentScene = 'accept';
 
-    const background = document.getElementById("background");
-    const overlay = document.getElementById("overlay");
-    const video = document.getElementById("video");
-    const button = document.getElementById("button");
+function goToScene(sceneName) {
+  currentScene = sceneName;
+  const scene = scenes[sceneName];
+  updateDisplay(scene); // 顯示背景圖與文字
+}
+    // 在切換背景之前，先隱藏所有內容，準備顯示新的場景
+        speech.style.display = 'none';
+        choices.style.display = 'none';
+        clickOverlay.style.display = 'none';
+        clickOverlay.onclick = null;
+        imageStep.style.display = 'none'; // 隱藏圖片步驟容器
+        imageStepBtn.style.display = 'none'; // 隱藏圖片步驟按鈕
+        introVideo.style.display = 'none'; // 確保影片隱藏
+        interactiveImageContainer.style.display = 'none'; // 確保互動容器隱藏
+        interactiveImageContainer.innerHTML = ''; // 清空疊加圖片
 
-    const audio = new Audio("assets/audio/button.mp3");
+function onClickNext() {
+  const scene = scenes[currentScene];
 
-    function playSound() {
-      audio.currentTime = 0;
-      audio.play().catch(() => {}); // 忽略用戶未互動時的自動播放限制
-    }
-
-    function showStep(stepName) {
-      currentStep = stepName;
-      const step = sequence[stepName];
-
-      if (!step) return;
-
-      // Reset
-      video.style.display = "none";
-      video.pause();
-      button.style.display = "none";
-
-      if (step.type === "image") {
-        background.src = step.background || "";
-        overlay.src = step.overlay || "";
-        background.style.display = "block";
-        overlay.style.display = "block";
-
-        if (step.button) {
-          button.style.display = "block";
-          button.onclick = () => {
-            playSound();
-            showStep(step.next);
-          };
-        }
-      } else if (step.type === "video") {
-        video.src = step.src;
-        background.style.display = "none";
-        overlay.style.display = "none";
-        video.style.display = "block";
-        video.load();
-        video.play();
-        video.onended = () => {
-          showStep(step.next);
-        };
-      }
-    }
-
-    showStep(currentStep);
+  if (scene.autoNext) {
+    goToScene(scene.autoNext);
+  } else {
+    // 顯示選項或暫停
+  }
+}
 
   </script>
 </body>
