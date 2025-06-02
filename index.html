@@ -554,26 +554,8 @@
       },
 
     };
-    let currentId = 'accept';
-
-    function renderScene(id) {
-      const scene = script[id];
-      document.getElementById('bg').src = scene.bg;
-      document.getElementById('speech').textContent = scene.speech;
-      const choicesDiv = document.querySelector('.choices');
-      choicesDiv.innerHTML = '';
-
-      if (scene.choices && scene.choices.length > 0) {
-        scene.choices.forEach(choice => {
-          const btn = document.createElement('button');
-          btn.textContent = choice.text;
-          btn.onclick = () => renderScene(choice.next);
-          choicesDiv.appendChild(btn);
-        });
-      } else if (scene.autoNext) {
-        setTimeout(() => renderScene(scene.autoNext), 2000); // 自動跳轉（2 秒後）
-      }
-    }
+// 初始畫面從某個 key 開始，例如 'd5'
+    goTo('accept');
 
     // --- 核心函數：切換遊戲場景顯示 ---
     function goTo(key) {
