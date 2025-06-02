@@ -512,69 +512,45 @@
         autoNext: 'd2',
         choices: []
       },
-
-
     };
-
-    let currentScene = 'accept';
-
-function goToScene(sceneName) {
-  currentScene = sceneName;
-  const scene = scenes[sceneName];
-  updateDisplay(scene); // 顯示背景圖與文字
-}
 
 function onClickNext() {
   const scene = scenes[currentScene];
-
   if (scene.autoNext) {
-    goToScene(scene.autoNext);
+    goTo(scene.autoNext);
   } else {
     // 顯示選項或暫停
   }
 }
 
-// --- 核心函數：切換遊戲場景顯示 ---
-    function goTo(key) {
-        const scene = scenes[key];
+function goTo(key) {
+  currentScene = key;  // 更新當前場景
+  const scene = scenes[key];
 
-        // 在切換背景之前，先隱藏所有內容，準備顯示新的場景
-        speech.style.display = 'none';
-        choices.style.display = 'none';
-        clickOverlay.style.display = 'none';
-        clickOverlay.onclick = null;
-        imageStep.style.display = 'none'; // 隱藏圖片步驟容器
-        imageStepBtn.style.display = 'none'; // 隱藏圖片步驟按鈕
-        introVideo.style.display = 'none'; // 確保影片隱藏
-        interactiveImageContainer.style.display = 'none'; // 確保互動容器隱藏
-        interactiveImageContainer.innerHTML = ''; // 清空疊加圖片
+  // 省略其他畫面隱藏代碼...
 
-        // 設定新的背景圖片，並在圖片載入完成後顯示文字和按鈕
-        setBackground(scene.bg, () => {
-            speech.innerText = scene.speech;
-            speech.style.display = 'block'; // 顯示對話框
+  setBackground(scene.bg, () => {
+    speech.innerText = scene.speech;
+    speech.style.display = 'block';
 
-            if (scene.choices.length > 0) {
-                // 為每個選項按鈕綁定點擊事件，並在點擊時播放音效
-                choices.innerHTML = scene.choices.map(choice =>
-                  `<button class="btn" onclick="playButtonSound(); goTo('${choice.next}')">${choice.text}</button>`
-                ).join('');
-                choices.style.display = 'block'; // 顯示選項按鈕
-            } else if (scene.autoNext) {
-                // 如果沒有選項但有 autoNext，顯示點擊提示，並啟用點擊層
-                choices.innerHTML = '<div style="color: white; font-size: 14px; margin-top: 10px;">（點擊畫面繼續）</div>';
-                choices.style.display = 'block';
-                clickOverlay.style.display = 'block';
-                clickOverlay.onclick = () => {
-                    playButtonSound(); // 點擊疊加層繼續時播放音效
-                    goTo(scene.autoNext);
-                };
-            } else {
-                // 遊戲結束場景 (例如 a6)，清空按鈕，讓畫面保持純背景
-                choices.innerHTML = '';
-            }
-        });
+    if (scene.choices.length > 0) {
+      // 顯示選項按鈕
+    } else if (scene.autoNext) {
+      choices.innerHTML = '<div style="color: white; font-size: 14px; margin-top: 10px;">（點擊畫面繼續）</div>';
+      choices.style.display = 'block';
+      clickOverlay.style.display = 'block';
+      clickOverlay.onclick = () => {
+        playButtonSound();
+        goTo(scene.autoNext);
+      };
+    } else {
+      choices.innerHTML = '';
+      clickOverlay.style.display = 'none';
+      clickOverlay.onclick = null;
     }
+  });
+}
+
 
   </script>
 </body>
