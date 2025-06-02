@@ -22,6 +22,7 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
       overflow: hidden; /* Prevent content from spilling out */
     }
+    
     #background-image-element {
         position: absolute;
         top: 0;
@@ -541,6 +542,8 @@ function onClickNext() {
   }
 }
 
+// 在 goTo 函數中，修改 autoNext 的處理邏輯
+
 function goTo(key) {
   if (!scenes[key]) {
     console.error(`場景 ${key} 不存在！`);
@@ -568,29 +571,38 @@ function goTo(key) {
         `<button class="btn" onclick="playButtonSound(); goTo('${choice.next}')">${choice.text}</button>`
       ).join('');
       choices.style.display = 'block';
-      clickOverlay.style.display = 'none';  // 選項時不開啟點擊疊加層
+      clickOverlay.style.display = 'none';
       clickOverlay.onclick = null;
     } else if (scene.autoNext) {
-      // 沒有選項但有 autoNext，顯示點擊畫面繼續提示，並綁定點擊事件
+      // 修復：確保 clickOverlay 正確設定
       choices.innerHTML = '<div style="color: white; font-size: 14px; margin-top: 10px;">（點擊畫面繼續）</div>';
       choices.style.display = 'block';
-      clickOverlay.style.display = 'block';
       
-      // 修復：確保 clickOverlay 有正確的點擊事件處理
-      clickOverlay.onclick = (event) => {
-        console.log('clickOverlay clicked for autoNext'); // 調試用
+      // 確保 clickOverlay 覆蓋整個遊戲區域
+      clickOverlay.style.display = 'block';
+      clickOverlay.style.width = '100%';
+      clickOverlay.style.height = '100%';
+      clickOverlay.style.top = '0';
+      clickOverlay.style.left = '0';
+      clickOverlay.style.position = 'absolute';
+      clickOverlay.style.zIndex = '10'; // 提高 z-index
+      
+      // 移除舊的事件監聽器並添加新的
+      clickOverlay.onclick = null;
+      clickOverlay.addEventListener('click', function handleAutoNext(event) {
+        console.log('clickOverlay clicked for autoNext:', scene.autoNext); // 調試用
         event.preventDefault();
         event.stopPropagation();
+        
+        // 移除事件監聽器避免重複觸發
+        clickOverlay.removeEventListener('click', handleAutoNext);
+        
         playButtonSound();
         goTo(scene.autoNext);
-      };
-      
-      // 額外的調試：檢查 clickOverlay 是否可見
-      console.log('clickOverlay display:', window.getComputedStyle(clickOverlay).display);
-      console.log('clickOverlay z-index:', window.getComputedStyle(clickOverlay).zIndex);
+      }, { once: true }); // 使用 once: true 確保只執行一次
       
     } else {
-      // 沒有選項也沒 autoNext，結束或靜止
+      // 沒有選項也沒 autoNext
       choices.innerHTML = '';
       clickOverlay.style.display = 'none';
       clickOverlay.onclick = null;
