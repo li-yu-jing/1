@@ -514,20 +514,33 @@
       },
     };
 
+let currentScene = 'accept';
+
 function onClickNext() {
   const scene = scenes[currentScene];
+
   if (scene.autoNext) {
     goTo(scene.autoNext);
+  } else if (scene.choices.length > 0) {
+    // 如果有選項，可以顯示選項或其他行為
   } else {
-    // 顯示選項或暫停
+    // 沒有 autoNext 也沒有選項，遊戲結束或暫停
   }
 }
 
 function goTo(key) {
-  currentScene = key;  // 更新當前場景
+  if (!scenes[key]) {
+    console.error(`場景 ${key} 不存在！`);
+    return;
+  }
+  currentScene = key;
   const scene = scenes[key];
 
-  // 省略其他畫面隱藏代碼...
+  // 隱藏所有互動區域
+  speech.style.display = 'none';
+  choices.style.display = 'none';
+  clickOverlay.style.display = 'none';
+  clickOverlay.onclick = null;
 
   setBackground(scene.bg, () => {
     speech.innerText = scene.speech;
@@ -535,7 +548,14 @@ function goTo(key) {
 
     if (scene.choices.length > 0) {
       // 顯示選項按鈕
+      choices.innerHTML = scene.choices.map(choice =>
+        `<button class="btn" onclick="playButtonSound(); goTo('${choice.next}')">${choice.text}</button>`
+      ).join('');
+      choices.style.display = 'block';
+      clickOverlay.style.display = 'none';  // 選項時不開啟點擊疊加層
+      clickOverlay.onclick = null;
     } else if (scene.autoNext) {
+      // 沒有選項但有 autoNext，顯示點擊畫面繼續提示，並綁定點擊事件
       choices.innerHTML = '<div style="color: white; font-size: 14px; margin-top: 10px;">（點擊畫面繼續）</div>';
       choices.style.display = 'block';
       clickOverlay.style.display = 'block';
@@ -544,12 +564,14 @@ function goTo(key) {
         goTo(scene.autoNext);
       };
     } else {
+      // 沒有選項也沒 autoNext，結束或靜止
       choices.innerHTML = '';
       clickOverlay.style.display = 'none';
       clickOverlay.onclick = null;
     }
   });
 }
+
 
 
   </script>
