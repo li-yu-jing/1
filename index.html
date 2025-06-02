@@ -141,15 +141,13 @@
     }
     #clickOverlay {
       display: none;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
       position: absolute;
-      z-index: 999;         /* 保證在最上層 */
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%; height: 100%;
+      z-index: 999;
       cursor: pointer;
-      pointer-events: auto; /* 這是關鍵！讓它可以點擊 */
-}
+      pointer-events: auto;
+    }
     /* imageStep now is just a container for the button */
     #imageStep {
         position: absolute;
@@ -208,8 +206,9 @@
   <div id="loadingScreen">載入中... 0%</div>
 
   <div class="game-container" id="mainGameContainer">
+    <div id="clickOverlay"></div>
     <img id="background-image-element" src="" alt="背景圖片">
-
+  
     <div id="interactive-image-container">
         </div>
 
@@ -554,7 +553,7 @@
     // --- 核心函數：切換遊戲場景顯示 ---
     function goTo(key) {
         const scene = scenes[key];
-
+        
         // 在切換背景之前，先隱藏所有內容，準備顯示新的場景
         speech.style.display = 'none';
         choices.style.display = 'none';
@@ -586,6 +585,7 @@
                     playButtonSound(); // 點擊疊加層繼續時播放音效
                     goTo(scene.autoNext);
                 };
+              console.log("clickOverlay should be visible now!");
             } else {
                 // 遊戲結束場景 (例如 a6)，清空按鈕，讓畫面保持純背景
                 choices.innerHTML = '';
