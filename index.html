@@ -518,7 +518,6 @@ let currentScene = 'accept';
 
 function onClickNext() {
   const scene = scenes[currentScene];
-
   if (scene.autoNext) {
     goTo(scene.autoNext);
   } else if (scene.choices.length > 0) {
@@ -533,19 +532,22 @@ function goTo(key) {
     console.error(`場景 ${key} 不存在！`);
     return;
   }
+  
+  console.log(`Going to scene: ${key}`); // 調試用
+  
   currentScene = key;
   const scene = scenes[key];
-
+  
   // 隱藏所有互動區域
   speech.style.display = 'none';
   choices.style.display = 'none';
   clickOverlay.style.display = 'none';
   clickOverlay.onclick = null;
-
+  
   setBackground(scene.bg, () => {
     speech.innerText = scene.speech;
     speech.style.display = 'block';
-
+    
     if (scene.choices.length > 0) {
       // 顯示選項按鈕
       choices.innerHTML = scene.choices.map(choice =>
@@ -559,11 +561,20 @@ function goTo(key) {
       choices.innerHTML = '<div style="color: white; font-size: 14px; margin-top: 10px;">（點擊畫面繼續）</div>';
       choices.style.display = 'block';
       clickOverlay.style.display = 'block';
-      clickOverlay.onclick = () => {
-        console.log('clickOverlay clicked');
+      
+      // 修復：確保 clickOverlay 有正確的點擊事件處理
+      clickOverlay.onclick = (event) => {
+        console.log('clickOverlay clicked for autoNext'); // 調試用
+        event.preventDefault();
+        event.stopPropagation();
         playButtonSound();
         goTo(scene.autoNext);
       };
+      
+      // 額外的調試：檢查 clickOverlay 是否可見
+      console.log('clickOverlay display:', window.getComputedStyle(clickOverlay).display);
+      console.log('clickOverlay z-index:', window.getComputedStyle(clickOverlay).zIndex);
+      
     } else {
       // 沒有選項也沒 autoNext，結束或靜止
       choices.innerHTML = '';
@@ -572,8 +583,6 @@ function goTo(key) {
     }
   });
 }
-
-
 
   </script>
 </body>
