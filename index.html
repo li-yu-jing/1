@@ -560,15 +560,7 @@ function onClickNext() {
                   `<button class="btn" onclick="playButtonSound(); goTo('${choice.next}')">${choice.text}</button>`
                 ).join('');
                 choices.style.display = 'block'; // 顯示選項按鈕
-            } else if (scene.autoNext) {
-                // 如果沒有選項但有 autoNext，顯示點擊提示，並啟用點擊層
-                choices.innerHTML = '<div style="color: white; font-size: 14px; margin-top: 10px;">（點擊畫面繼續）</div>';
-                choices.style.display = 'block';
-                clickOverlay.style.display = 'block';
-                clickOverlay.onclick = () => {
-                    playButtonSound(); // 點擊疊加層繼續時播放音效
-                    goTo(scene.autoNext);
-                };
+            } else if 
             } else {
                 // 遊戲結束場景 (例如 a6)，清空按鈕，讓畫面保持純背景
                 choices.innerHTML = '';
