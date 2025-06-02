@@ -560,6 +560,7 @@ function goTo(key) {
       choices.style.display = 'block';
       clickOverlay.style.display = 'block';
       clickOverlay.onclick = () => {
+        console.log('clickOverlay clicked');
         playButtonSound();
         goTo(scene.autoNext);
       };
