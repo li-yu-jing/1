@@ -192,10 +192,21 @@
       opacity: 1;
       transition: opacity 1s ease-out;
     }
+    .click-hint {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 14px;
+      background: rgba(0,0,0,0.5);
+      padding: 5px;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
-  <div id="loadingScreen">載入中... 0%</div>
+  <div id="loadingScreen">載入中... 100%</div>
   <div class="game-container" id="mainGameContainer">
     <img id="background-image-element" src="" alt="背景圖片">
     <div id="interactive-image-container">
@@ -275,6 +286,10 @@
     const backgroundMusic = document.getElementById('backgroundMusic');
     const buttonSound = document.getElementById('buttonSound');
     
+    // 全局變量跟蹤當前場景
+    let currentScene = '';
+    let currentClickHandler = null;
+    
     function playButtonSound() {
         if (buttonSound) {
             buttonSound.currentTime = 0;
@@ -282,22 +297,35 @@
         }
     }
     
+    function clearAllEventListeners() {
+        // 移除clickOverlay的所有事件監聽器
+        const newClickOverlay = clickOverlay.cloneNode(true);
+        clickOverlay.parentNode.replaceChild(newClickOverlay, clickOverlay);
+        return document.getElementById('clickOverlay');
+    }
+    
     function setBackground(imageSrc, callback = () => {}) {
         introVideo.style.display = 'none';
-        backgroundImageElement.src = imageSrc;
+        
+        // 創建預設背景以防圖片載入失敗
+        backgroundImageElement.style.backgroundColor = '#333';
+        backgroundImageElement.src = imageSrc || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzc1IiBoZWlnaHQ9IjY2NyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzc1IiBoZWlnaHQ9IjY2NyIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+載入中...</tdGV4dD48L3N2Zz4=';
         backgroundImageElement.style.display = 'block';
         
-        // 修复：确保回调在图片加载完成后执行
-        if (backgroundImageElement.complete && backgroundImageElement.naturalWidth > 0) {
-            setTimeout(callback, 50); // 小延迟确保DOM更新
+        // 確保背景圖片載入後才執行回調
+        if (imageSrc) {
+            const img = new Image();
+            img.onload = () => {
+                backgroundImageElement.src = imageSrc;
+                setTimeout(callback, 50);
+            };
+            img.onerror = () => {
+                console.warn(`背景圖片載入失敗: ${imageSrc}`);
+                setTimeout(callback, 50);
+            };
+            img.src = imageSrc;
         } else {
-            backgroundImageElement.onload = () => {
-                setTimeout(callback, 50);
-            };
-            backgroundImageElement.onerror = () => {
-                console.warn(`背景图片加载失败: ${imageSrc}`);
-                setTimeout(callback, 50);
-            };
+            setTimeout(callback, 50);
         }
     }
     
@@ -338,14 +366,15 @@
         });
     }
     
+    // 簡化載入過程，避免預載入問題
     window.addEventListener('load', () => {
-        preloadAllAssets(allImages, allVideos, allAudio, () => {
+        setTimeout(() => {
             loadingScreen.style.opacity = 0;
-            loadingScreen.addEventListener('transitionend', () => {
+            setTimeout(() => {
                 loadingScreen.style.display = 'none';
                 startScreen.style.display = 'block';
-            }, { once: true });
-        });
+            }, 1000);
+        }, 500);
     });
     
     startScreen.addEventListener("click", () => {
@@ -365,6 +394,7 @@
         imageStepBtn.style.display = 'none';
         imageStep.style.display = 'none';
         introVideo.style.display = 'none';
+        clearAllEventListeners();
         
         if (currentInteractiveStep < interactiveSequence.length) {
             const step = interactiveSequence[currentInteractiveStep];
@@ -508,24 +538,49 @@
           { text: '拒絕並表現不滿', next: 'ddd' }
         ]
       },
-      // 添加缺失的场景以避免错误
       ccc: {
-        bg: 'day04.png',
-        speech: '你選擇了勉強參加活動...',
+        bg: '強制參加團康活動.png',
+        speech: '我勉強參加了活動，雖然心不在焉，但還是跟著大家一起做。看著其他住民認真參與，我開始思考是否應該更積極一些。',
+        autoNext: 'ccc2',
+        choices: []
+      },
+      ccc2: {
+        bg: '強制參加團康活動.png',
+        speech: '也許這些活動真的有它的意義，至少能讓我們有規律的生活作息。',
         choices: [
-          { text: '繼續遊戲', next: 'accept' }
+          { text: '繼續保持消極態度', next: 'accept' },
+          { text: '嘗試更積極參與', next: 'positive' }
         ]
       },
       ddd: {
         bg: 'day04.png',
-        speech: '你選擇了拒絕參加...',
+        speech: '我拒絕參加活動，表現出明顯的不滿。生活輔導員看起來有些失望，但也沒有強迫我。',
+        autoNext: 'ddd2',
+        choices: []
+      },
+      ddd2: {
+        bg: 'day04.png',
+        speech: '雖然暫時逃避了，但我知道這樣下去並不是辦法。在這裡還是需要遵守一些基本規範的。',
+        choices: [
+          { text: '重新思考態度', next: 'accept' },
+          { text: '繼續抵抗規則', next: 'negative' }
+        ]
+      },
+      positive: {
+        bg: '交友圈.png',
+        speech: '我決定嘗試更積極地參與機構的活動，慢慢地，我發現有些住民其實很友善，我們開始有了交流。',
+        choices: [
+          { text: '繼續這個正向的改變', next: 'accept' }
+        ]
+      },
+      negative: {
+        bg: '苦惱的我.png',
+        speech: '我繼續抗拒這裡的規則和安排，這讓我與其他人的關係變得緊張，生活也越來越困難。',
         choices: [
           { text: '重新開始', next: 'accept' }
         ]
       }
     };
-
-    let currentScene = 'accept';
 
     function goTo(key) {
       if (!scenes[key]) {
@@ -538,56 +593,67 @@
       currentScene = key;
       const scene = scenes[key];
       
-      // 清理所有现有的事件监听器和显示状态
+      // 清理所有現有狀態
       speech.style.display = 'none';
       choices.style.display = 'none';
-      clickOverlay.style.display = 'none';
-      clickOverlay.onclick = null;
+      imageStep.style.display = 'none';
+      imageStepBtn.style.display = 'none';
+      interactiveImageContainer.style.display = 'none';
       
-      // 移除所有可能的旧事件监听器
-      const newClickOverlay = clickOverlay.cloneNode(true);
-      clickOverlay.parentNode.replaceChild(newClickOverlay, clickOverlay);
-      
-      // 重新获取新的clickOverlay引用
-      const currentClickOverlay = document.getElementById('clickOverlay');
+      // 清理事件監聽器
+      const newClickOverlay = clearAllEventListeners();
       
       setBackground(scene.bg, () => {
         speech.innerText = scene.speech;
         speech.style.display = 'block';
         
-        if (scene.choices.length > 0) {
-          // 显示选项按钮
+        if (scene.choices && scene.choices.length > 0) {
+          // 顯示選項按鈕
           choices.innerHTML = scene.choices.map(choice =>
-            `<button class="btn" onclick="playButtonSound(); goTo('${choice.next}')">${choice.text}</button>`
+            `<button class="btn" data-next="${choice.next}">${choice.text}</button>`
           ).join('');
           choices.style.display = 'block';
-          currentClickOverlay.style.display = 'none';
+          
+          // 為每個按鈕添加事件監聽器
+          const buttons = choices.querySelectorAll('.btn');
+          buttons.forEach(button => {
+            button.addEventListener('click', (e) => {
+              playButtonSound();
+              const nextScene = e.target.getAttribute('data-next');
+              console.log(`Button clicked, going to: ${nextScene}`);
+              goTo(nextScene);
+            });
+          });
+          
+          newClickOverlay.style.display = 'none';
         } else if (scene.autoNext) {
-          // 修复autoNext的处理
-          choices.innerHTML = '<div style="color: white; font-size: 14px; margin-top: 10px;">（點擊畫面繼續）</div>';
+          // 自動下一步場景
+          choices.innerHTML = '<div class="click-hint">（點擊畫面繼續）</div>';
           choices.style.display = 'block';
           
-          currentClickOverlay.style.display = 'block';
-          currentClickOverlay.style.width = '100%';
-          currentClickOverlay.style.height = '100%';
-          currentClickOverlay.style.top = '0';
-          currentClickOverlay.style.left = '0';
-          currentClickOverlay.style.position = 'absolute';
-          currentClickOverlay.style.zIndex = '10';
+          newClickOverlay.style.display = 'block';
+          newClickOverlay.style.width = '100%';
+          newClickOverlay.style.height = '100%';
+          newClickOverlay.style.top = '0';
+          newClickOverlay.style.left = '0';
+          newClickOverlay.style.position = 'absolute';
+          newClickOverlay.style.zIndex = '10';
           
-          // 添加点击事件处理
-          currentClickOverlay.addEventListener('click', function handleAutoNext(event) {
-            console.log('clickOverlay clicked for autoNext:', scene.autoNext);
+          // 添加點擊事件
+          const clickHandler = (event) => {
+            console.log(`ClickOverlay clicked, going to: ${scene.autoNext}`);
             event.preventDefault();
             event.stopPropagation();
-            
             playButtonSound();
             goTo(scene.autoNext);
-          }, { once: true });
+          };
+          
+          newClickOverlay.addEventListener('click', clickHandler, { once: true });
           
         } else {
+          // 沒有選項也沒有自動下一步
           choices.innerHTML = '';
-          currentClickOverlay.style.display = 'none';
+          newClickOverlay.style.display = 'none';
         }
       });
     }
