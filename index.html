@@ -22,7 +22,6 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
       overflow: hidden; /* Prevent content from spilling out */
     }
-
     #background-image-element {
         position: absolute;
         top: 0;
@@ -33,7 +32,6 @@
         opacity: 1;
         z-index: 1;
     }
-
     /* 所有遊戲內容（對話框、按鈕、影片、疊加圖片）都在背景圖片之上 */
     .content,
     .speech-bubble,
@@ -41,12 +39,17 @@
     #introVideo,
     #interactive-image-container, /* 新增的互動圖片容器 */
     #imageStepBtn,
-    .end-screen,
-    #clickOverlay {
+    .end-screen {
       position: absolute;
       z-index: 2; /* 比背景圖片高 */
     }
-
+    
+    /* clickOverlay 需要更高的 z-index 來確保能接收點擊 */
+    #clickOverlay {
+      position: absolute;
+      z-index: 5; /* 提高 z-index */
+    }
+    
     /* 確保影片顯示在背景圖片之上 */
     #introVideo {
       top: 0;
@@ -57,7 +60,6 @@
       display: none;
       z-index: 3;
     }
-
     /* 新增的互動圖片容器樣式 */
     #interactive-image-container {
         top: 0;
@@ -68,7 +70,6 @@
         z-index: 2; /* 在背景圖片之上 */
         pointer-events: none; /* 讓點擊穿透到下面的按鈕 */
     }
-
     /* 疊加的 Line 對話圖片樣式 */
     .overlay-image {
         position: absolute;
@@ -79,7 +80,6 @@
         object-fit: contain; /* 保持圖片比例 */
         display: block; /* 預設為 block，因為是動態添加，添加後就該顯示 */
     }
-
     /* 其他既有樣式 (保留不變) */
     .content {
       bottom: 18px;
@@ -146,6 +146,7 @@
       right: 0;
       bottom: 0;
       cursor: pointer;
+      background-color: transparent; /* 確保有背景色，即使是透明的 */
     }
     /* imageStep now is just a container for the button */
     #imageStep {
@@ -203,35 +204,27 @@
 </head>
 <body>
   <div id="loadingScreen">載入中... 0%</div>
-
   <div class="game-container" id="mainGameContainer">
     <img id="background-image-element" src="" alt="背景圖片">
-
     <div id="interactive-image-container">
         </div>
-
     <div class="speech-bubble" id="speech"></div>
     <div class="content" id="choices"></div>
-
     <div class="start-screen" id="startScreen">
       <div style="position: absolute; bottom: 20px; width: 100%; text-align: center; color: white; font-size: 16px;">
         點擊畫面繼續
       </div>
     </div>
-
     <video id="introVideo" playsinline autoplay muted preload="auto">
       <source src="" type="video/mp4">
       您的瀏覽器不支援 HTML5 視訊。
     </video>
-
     <div id="imageStep">
       <img id="imageStepBtn" src="點擊畫面繼續.png" alt="下一步" />
     </div>
-
     <div class="end-screen" id="endScreen"></div>
     <div id="clickOverlay"></div>
   </div>
-
   <audio id="backgroundMusic" src="BGM.mp3" loop preload="auto"></audio>
   <audio id="buttonSound" src="按鈕音效.mp3" preload="auto"></audio> <script>
     const allImages = [
@@ -247,17 +240,14 @@
       'Line對話1.png', 'Line對話2.png', 'Line對話3.png', 'Line對話穿插03.png',
       'Line對話4.png', 'Line對話5.png', 'Line對話6.png', 'Line對話7.png' // 新增 Line對話7.png
     ];
-
     const allVideos = [
     'Line對話影片03.mp4'
     ];
-
     // 新增背景音樂檔案到預載列表
     const allAudio = [
       'BGM.mp3',
       '按鈕音效.mp3' // 新增按鈕音效到預載列表
     ];
-
     // 定義所有互動圖片的序列
     const interactiveSequence = [
         { type: 'lineChatSeriesInit', bg: 'Line對話1.png', button: '點擊畫面繼續.png' },
@@ -276,9 +266,7 @@
         { type: 'static', bg: '計點規則5.png', button: '點擊畫面繼續.png' },
         { type: 'static', bg: '計點規則6.png', button: '點擊畫面繼續.png' }
     ];
-
     let currentInteractiveStep = 0; // 當前互動步驟的索引
-
     // 獲取 DOM 元素
     const startScreen = document.getElementById('startScreen');
     const introVideo = document.getElementById('introVideo');
@@ -293,7 +281,6 @@
     const interactiveImageContainer = document.getElementById('interactive-image-container');
     const backgroundMusic = document.getElementById('backgroundMusic'); // 獲取背景音樂元素
     const buttonSound = document.getElementById('buttonSound'); // 獲取按鈕音效元素
-
     // --- 輔助函數：播放按鈕音效 ---
     function playButtonSound() {
         if (buttonSound) {
@@ -301,19 +288,16 @@
             buttonSound.play().catch(e => console.warn("按鈕音效播放失敗:", e));
         }
     }
-
     // --- 輔助函數：切換背景圖片 ---
     function setBackground(imageSrc, callback = () => {}) {
         introVideo.style.display = 'none';
         backgroundImageElement.src = imageSrc;
         backgroundImageElement.style.display = 'block';
-
         const onImageLoaded = () => {
             backgroundImageElement.removeEventListener('load', onImageLoaded);
             backgroundImageElement.removeEventListener('error', onImageLoaded);
             callback();
         };
-
         if (backgroundImageElement.complete) {
             onImageLoaded();
         } else {
@@ -321,17 +305,14 @@
             backgroundImageElement.onerror = onImageLoaded;
         }
     }
-
     // --- 預載所有圖片、影片和音頻的函數 ---
     function preloadAllAssets(images, videos, audio, callback) {
         let loadedCount = 0;
         const totalAssets = images.length + videos.length + audio.length;
-
         if (totalAssets === 0) {
             callback();
             return;
         }
-
         const updateLoadingProgress = () => {
             loadedCount++;
             const progress = Math.floor((loadedCount / totalAssets) * 100);
@@ -340,14 +321,12 @@
                 callback();
             }
         };
-
         images.forEach(imgSrc => {
             const img = new Image();
             img.src = imgSrc;
             img.onload = updateLoadingProgress;
             img.onerror = updateLoadingProgress;
         });
-
         videos.forEach(vidSrc => {
             const vid = document.createElement('video');
             vid.src = vidSrc;
@@ -356,7 +335,6 @@
             vid.onerror = updateLoadingProgress;
             vid.load();
         });
-
         audio.forEach(audioSrc => {
             const aud = new Audio(); // 使用 Audio 物件
             aud.src = audioSrc;
@@ -366,7 +344,6 @@
             aud.load();
         });
     }
-
     // --- 遊戲初始化與預載 ---
     window.addEventListener('load', () => {
         preloadAllAssets(allImages, allVideos, allAudio, () => {
@@ -378,7 +355,6 @@
             }, { once: true });
         });
     });
-
     // --- 開場畫面點擊事件 (現在也用來確保音樂播放) ---
     startScreen.addEventListener("click", () => {
         startScreen.style.display = "none";
@@ -392,7 +368,6 @@
             showNextInteractiveStep(); // 即使音樂播放失敗，遊戲劇情也應該繼續
         });
     });
-
     // --- 顯示下一個互動步驟 ---
     function showNextInteractiveStep() {
         // 隱藏所有互動元素，為下一個步驟做準備
@@ -405,7 +380,6 @@
         // 檢查是否還有下一個步驟
         if (currentInteractiveStep < interactiveSequence.length) {
             const step = interactiveSequence[currentInteractiveStep];
-
             // 處理上一個步驟的隱藏邏輯 (如果上一步有 hideOnNext: true 或 clearOnNext: true)
             if (currentInteractiveStep > 0) {
                 const prevStep = interactiveSequence[currentInteractiveStep - 1];
@@ -423,8 +397,6 @@
                     // backgroundImageElement.style.display = 'none'; // 這裡不再隱藏背景，因為下一個步驟會設置新背景
                 }
             }
-
-
             if (step.type === 'lineChatSeriesInit') {
                 interactiveImageContainer.innerHTML = ''; // 清空疊加圖片 (如果之前有其他圖片殘留)
                 setBackground(step.bg, () => {
@@ -439,11 +411,9 @@
                 overlayImg.src = step.overlay;
                 overlayImg.classList.add('overlay-image');
                 interactiveImageContainer.appendChild(overlayImg);
-
                 // 確保背景圖片顯示（對於疊加系列，背景圖片是 Line對話1.png）
                 backgroundImageElement.style.display = 'block';
                 interactiveImageContainer.style.display = 'block';
-
                 imageStep.style.display = 'flex';
                 imageStepBtn.src = step.button || "點擊畫面繼續.png";
                 imageStepBtn.classList.remove('line-button');
@@ -464,11 +434,9 @@
                 backgroundImageElement.style.display = 'none';
                 interactiveImageContainer.innerHTML = '';
                 interactiveImageContainer.style.display = 'none';
-
                 introVideo.src = step.src;
                 introVideo.style.display = 'block';
                 introVideo.play();
-
                 introVideo.onended = () => {
                     currentInteractiveStep++;
                     showNextInteractiveStep();
@@ -485,19 +453,16 @@
             return;
         }
     }
-
     // --- 圖片步驟按鈕點擊事件 (現在用於推進互動序列) ---
     imageStepBtn.addEventListener("click", () => {
         playButtonSound(); // 點擊圖片步驟按鈕時播放音效
         currentInteractiveStep++;
         showNextInteractiveStep();
     });
-
     // --- 進入主遊戲場景的開頭 (保留原有邏輯) ---
     function startScene() {
         goTo("accept");
     }
-
     // --- 場景資料 (完全保留不變) ---
     const scenes = {
       accept: {
@@ -512,6 +477,36 @@
         autoNext: 'd2',
         choices: []
       },
+      d2: {
+        bg: 'day04.png',
+        speech: '我已經習慣了機構的生活節奏，每天早起參加晨會、整理內務、參與課程。雖然規律，但我感到有些束縛。',
+        choices: [
+          { text: '接受現狀，繼續適應', next: 'adapt' },
+          { text: '尋找改變的機會', next: 'change' }
+        ]
+      },
+      adapt: {
+        bg: 'day04.png',
+        speech: '我選擇接受現狀，慢慢適應這裡的生活。雖然有時會感到壓抑，但至少有個安穩的地方。',
+        autoNext: 'end_adapt',
+        choices: []
+      },
+      change: {
+        bg: 'day04.png',
+        speech: '我決定尋找改變的機會，積極參與各種課程和活動，希望能早日重新站起來。',
+        autoNext: 'end_change',
+        choices: []
+      },
+      end_adapt: {
+        bg: 'day04.png',
+        speech: '經過一段時間的適應，我漸漸找到了在機構中的平衡點。雖然自由受限，但我學會了珍惜當下的安穩。',
+        choices: []
+      },
+      end_change: {
+        bg: 'day04.png',
+        speech: '通過積極參與和努力學習，我逐漸獲得了社工的信任，也為自己的未來找到了新的方向。改變雖然不容易，但值得。',
+        choices: []
+      }
     };
 
 let currentScene = 'accept';
@@ -583,7 +578,6 @@ function goTo(key) {
     }
   });
 }
-
   </script>
 </body>
 </html>
