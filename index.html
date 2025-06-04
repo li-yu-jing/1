@@ -2,7 +2,8 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=375, initial-scale=1.0" />
+  <!-- <meta name="viewport" content="width=375, initial-scale=1.0" /> -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>街友安置體驗</title>
   <style>
     body {
@@ -397,6 +398,7 @@
 
     // --- 顯示下一個互動步驟 ---
     function showNextInteractiveStep() {
+        console.log("執行 showNextInteractiveStep，currentInteractiveStep =", currentInteractiveStep);
         // 隱藏所有互動元素，為下一個步驟做準備
         speech.style.display = 'none';
         choices.style.display = 'none';
@@ -471,10 +473,15 @@
                 introVideo.style.display = 'block';
                 introVideo.play();
 
-                introVideo.onended = () => {
-                    currentInteractiveStep++;
-                    showNextInteractiveStep();
-                };
+                introVideo.addEventListener('ended', () => {
+                  console.log("影片播放結束");
+                  currentInteractiveStep++;
+                  try {
+                      showNextInteractiveStep();
+                  } catch(e) {
+                      console.error("showNextInteractiveStep 執行錯誤", e);
+                  }
+                });
                 return; // 影片播放結束後會自動推進，所以這裡直接返回
             }
         } else {
