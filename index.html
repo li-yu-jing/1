@@ -572,6 +572,7 @@
 
         // 設定新的背景圖片，並在圖片載入完成後顯示文字和按鈕
         setBackground(scene.bg, () => {
+            console.log("scene", scene)
             speech.innerText = scene.speech;
             speech.style.display = 'block'; // 顯示對話框
 
@@ -586,10 +587,10 @@
                 choices.innerHTML = '<div style="color: white; font-size: 14px; margin-top: 10px;">（點擊畫面繼續）</div>';
                 choices.style.display = 'block';
                 clickOverlay.style.display = 'block';
-                clickOverlay.onclick = () => {
-                    playButtonSound(); // 點擊疊加層繼續時播放音效
-                    goTo(scene.autoNext);
-                };
+                clickOverlay.addEventListener('click', () => {
+                  playButtonSound();
+                  goTo(scene.autoNext);
+                }, { once: true });
               console.log("clickOverlay should be visible now!");
             } else {
                 // 遊戲結束場景 (例如 a6)，清空按鈕，讓畫面保持純背景
