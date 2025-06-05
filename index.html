@@ -590,6 +590,7 @@
                 clickOverlay.addEventListener('click', () => {
                   playButtonSound();
                   goTo(scene.autoNext);
+                  clickOverlay.onclick = null;
                 }, { once: true });
               console.log("clickOverlay should be visible now!");
             } else {
