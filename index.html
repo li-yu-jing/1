@@ -206,7 +206,7 @@
   <div id="loadingScreen">載入中... 0%</div>
 
   <div class="game-container" id="mainGameContainer">
-    <div id="clickOverlay"></div>
+    <!-- <div id="clickOverlay"></div> -->
     <img id="background-image-element" src="" alt="背景圖片">
   
     <div id="interactive-image-container">
@@ -231,6 +231,7 @@
     </div>
 
     <div class="end-screen" id="endScreen"></div>
+    <div id="clickOverlay"></div>
   </div>
 
   <audio id="backgroundMusic" src="BGM.mp3" loop preload="auto"></audio>
@@ -559,6 +560,7 @@
         const scene = scenes[key];
         
         // 在切換背景之前，先隱藏所有內容，準備顯示新的場景
+        backgroundImageElement.style.display = 'none';
         speech.style.display = 'none';
         choices.style.display = 'none';
         clickOverlay.style.display = 'none';
